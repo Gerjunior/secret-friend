@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import mongoosePaginate from 'mongoose-paginate';
+import mongoosePaginate from 'mongoose-paginate-v2';
 
 export interface IGroup extends Document {
   id: string;
@@ -8,75 +8,62 @@ export interface IGroup extends Document {
   max_value: number;
   draw_date: Date;
   reveal_date: Date;
+  status: string;
   created_at: Date;
   updated_at: Date;
-  admin: {
-    _id: string;
-    name: string;
-    nickname: string;
-    description: string;
-    birth_date: string;
-    email: string;
-  };
+  admin_nickname: string;
   members: [
     {
       _id: string;
       name: string;
-      nickcname: string;
+      nickname: string;
       description: string;
-      birth_date: string;
+      birth_date: Date;
       email: string;
-      wishes: [string];
-      secret_friend: {
-        _id: string;
-        name: string;
-        nickname: string;
-        description: string;
-        birth_date: string;
-        email: string;
-        wishes: [string];
-      };
+      wishes: [string] | undefined;
+      secret_friend: string | undefined;
     },
   ];
 }
 
-const GroupSchema: Schema = new Schema({
-  name: { type: String, required: true },
-  min_value: Number,
-  max_value: Number,
-  draw_date: Date,
-  reveal_date: Date,
-  created_at: Date,
-  updated_at: Date,
-  admin: {
-    _id: { type: String, required: true },
-    name: { type: String, required: true },
-    nickname: { type: String, required: true },
-    description: String,
-    birth_date: String,
-    email: { type: String, required: true },
-  },
-  integrantes: [
-    {
-      _id: String,
-      name: String,
-      nickcname: String,
-      description: String,
-      birth_date: String,
-      email: String,
-      wishes: [String],
-      secret_friend: {
+export enum Status {
+  Awaiting = 'A',
+  Drawn = 'D',
+  Finished = 'F',
+  Cancelled = 'C',
+}
+
+const GroupSchema: Schema = new Schema(
+  {
+    name: { type: String, required: true, maxlength: 50, minlength: 2 },
+    min_value: Number,
+    max_value: Number,
+    draw_date: Date,
+    reveal_date: Date,
+    status: {
+      type: String,
+      enum: ['A', 'D', 'F', 'C'],
+      default: Status.Awaiting,
+      required: true,
+    },
+    created_at: Date,
+    updated_at: Date,
+    admin_nickname: { type: String, required: true },
+    members: [
+      {
         _id: String,
         name: String,
         nickname: String,
         description: String,
-        birth_date: String,
+        birth_date: Date,
         email: String,
         wishes: [String],
+        secret_friend: String,
       },
-    },
-  ],
-});
+    ],
+  },
+  { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } },
+);
 
 GroupSchema.plugin(mongoosePaginate);
 
