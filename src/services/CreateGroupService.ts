@@ -1,11 +1,9 @@
 import { isBefore, parseISO } from 'date-fns';
 
-import groupSchema, { IGroup } from '../models/Groups';
+import groupSchema, { IGroupMembers } from '../models/Groups';
 import AppError from '../errors/AppError';
 
 import UsersRepository from '../repositories/UsersRepository';
-
-const usersRepository = new UsersRepository();
 
 interface IRequest {
   admin_nickname: string;
@@ -16,7 +14,25 @@ interface IRequest {
   reveal_date: string;
 }
 
+interface IResponse {
+  id: string;
+  name: string;
+  status: string;
+  admin_nickname: string;
+  min_value: number;
+  max_value: number;
+  draw_date: Date;
+  reveal_date: Date;
+  members: [IGroupMembers];
+}
+
 class CreateGroupService {
+  private usersRepository: UsersRepository;
+
+  constructor(usersRepository: UsersRepository) {
+    this.usersRepository = usersRepository;
+  }
+
   public async execute({
     admin_nickname,
     name = 'UndefinedGroup',
@@ -24,8 +40,8 @@ class CreateGroupService {
     reveal_date,
     max_value = Infinity,
     min_value = 0,
-  }: IRequest): Promise<IGroup> {
-    const admin = await usersRepository.FindUserByNickname(admin_nickname);
+  }: IRequest): Promise<IResponse> {
+    const admin = await this.usersRepository.FindUserByNickname(admin_nickname);
 
     if (!admin) {
       throw new AppError('No user with this nickname could be found.', 404);
@@ -63,9 +79,19 @@ class CreateGroupService {
       members: [admin],
     });
 
-    await usersRepository.AddGroupToUser(group, admin_nickname);
+    await this.usersRepository.AddGroupToUser(group, admin_nickname);
 
-    return group;
+    return {
+      id: group.id,
+      name,
+      status: group.status,
+      min_value,
+      max_value,
+      draw_date: group.draw_date,
+      reveal_date: group.reveal_date,
+      admin_nickname,
+      members: group.members,
+    };
   }
 }
 

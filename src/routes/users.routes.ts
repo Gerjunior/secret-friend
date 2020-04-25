@@ -5,10 +5,16 @@ import isNumber from 'is-number';
 import userSchema from '../models/Users';
 
 import userFriendsRouter from './users.friends.routes';
+import userGroupsRouter from './user.groups.routes';
+
 import AppError from '../errors/AppError';
 
 import CreateUserService from '../services/CreateUserService';
 import UpdateUserService from '../services/UpdateUserService';
+
+import UsersRepository from '../repositories/UsersRepository';
+
+const usersRepository = new UsersRepository();
 
 const usersRouter = Router();
 
@@ -41,7 +47,7 @@ usersRouter.post('/', async (request, response) => {
     description,
   } = request.body;
 
-  const createUser = new CreateUserService();
+  const createUser = new CreateUserService(usersRepository);
 
   const user = await createUser.execute({
     name,
@@ -59,14 +65,7 @@ usersRouter.post('/', async (request, response) => {
 usersRouter.put('/:id', async (request, response) => {
   const { id } = request.params;
 
-  const {
-    name,
-    last_name,
-    email,
-    nickname,
-    birth_date,
-    description,
-  } = request.body;
+  const { name, last_name, birth_date, password, description } = request.body;
 
   const updateUser = new UpdateUserService();
 
@@ -74,8 +73,7 @@ usersRouter.put('/:id', async (request, response) => {
     id,
     name,
     last_name,
-    email,
-    nickname,
+    password,
     birth_date,
     description,
   });
@@ -107,6 +105,19 @@ usersRouter.use(
     next();
   },
   userFriendsRouter,
+);
+
+usersRouter.use(
+  '/:my_nickname/groups',
+  (request, response, next) => {
+    const { my_nickname } = request.params;
+
+    request.user = {
+      nickname: my_nickname,
+    };
+    next();
+  },
+  userGroupsRouter,
 );
 
 export default usersRouter;

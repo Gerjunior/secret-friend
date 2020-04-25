@@ -1,9 +1,7 @@
-import usersSchema, { IUser } from '../models/Users';
+import usersSchema, { IUserFriends } from '../models/Users';
 
 import UsersRepository from '../repositories/UsersRepository';
 import AppError from '../errors/AppError';
-
-const usersRepository = new UsersRepository();
 
 interface IRequest {
   my_nickname: string;
@@ -11,12 +9,22 @@ interface IRequest {
 }
 
 class RemoveFriendService {
+  private usersRepository: UsersRepository;
+
+  constructor(usersRepository: UsersRepository) {
+    this.usersRepository = usersRepository;
+  }
+
   public async execute({
     my_nickname,
     user_nickname,
-  }: IRequest): Promise<IUser> {
-    const myProfile = await usersRepository.FindUserByNickname(my_nickname);
-    const userProfile = await usersRepository.FindUserByNickname(user_nickname);
+  }: IRequest): Promise<IUserFriends[]> {
+    const myProfile = await this.usersRepository.FindUserByNickname(
+      my_nickname,
+    );
+    const userProfile = await this.usersRepository.FindUserByNickname(
+      user_nickname,
+    );
 
     if (!myProfile || !userProfile) {
       throw new AppError('No user with this nickname was found.', 404);
@@ -49,7 +57,7 @@ class RemoveFriendService {
       { new: true },
     );
 
-    return updatedUser;
+    return updatedUser.friends;
   }
 }
 

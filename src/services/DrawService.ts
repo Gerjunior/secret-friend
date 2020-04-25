@@ -1,9 +1,21 @@
-import groupSchema, { IGroup, Status } from '../models/Groups';
+import groupSchema, { Status, IGroupMembers } from '../models/Groups';
 
 import AppError from '../errors/AppError';
 
+interface IResponse {
+  id: string;
+  name: string;
+  min_value: number;
+  max_value: number;
+  draw_date: Date;
+  reveal_date: Date;
+  status: string;
+  admin_nickname: string;
+  members: [IGroupMembers];
+}
+
 class DrawService {
-  public async execute(group_id: string): Promise<IGroup> {
+  public async execute(group_id: string): Promise<IResponse> {
     const group = await groupSchema.findById(group_id);
 
     if (!group) {
@@ -93,7 +105,29 @@ class DrawService {
       );
     }
 
-    return updatedGroup;
+    const {
+      id,
+      name,
+      status,
+      admin_nickname,
+      draw_date,
+      reveal_date,
+      min_value,
+      max_value,
+      members,
+    } = updatedGroup;
+
+    return {
+      id,
+      name,
+      status,
+      admin_nickname,
+      draw_date,
+      reveal_date,
+      min_value,
+      max_value,
+      members,
+    };
   }
 }
 

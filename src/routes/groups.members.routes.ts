@@ -6,6 +6,9 @@ import AppError from '../errors/AppError';
 import AddUserToGroupService from '../services/AddUserToGroupService';
 import RemoveUserFromGroupService from '../services/RemoveUserFromGroupService';
 
+import UsersRepository from '../repositories/UsersRepository';
+
+const usersRepository = new UsersRepository();
 const groupMembersRouter = Router();
 
 groupMembersRouter.get('/', async (request, response) => {
@@ -24,20 +27,26 @@ groupMembersRouter.post('/add/:nickname', async (request, response) => {
   const { nickname } = request.params;
   const { id } = request.group;
 
-  const addUserToGroup = new AddUserToGroupService();
+  const addUserToGroup = new AddUserToGroupService(usersRepository);
 
-  const group = await addUserToGroup.execute(id, nickname);
+  const group = await addUserToGroup.execute({
+    group_id: id,
+    user_nickname: nickname,
+  });
 
   return response.json(group);
 });
 
-groupMembersRouter.delete('/remove/:nickname', async (request, response) => {
+groupMembersRouter.post('/remove/:nickname', async (request, response) => {
   const { nickname } = request.params;
   const { id } = request.group;
 
   const removeUserFromGroup = new RemoveUserFromGroupService();
 
-  const group = await removeUserFromGroup.execute(id, nickname);
+  const group = await removeUserFromGroup.execute({
+    group_id: id,
+    user_nickname: nickname,
+  });
 
   return response.json(group);
 });

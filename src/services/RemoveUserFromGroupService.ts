@@ -1,13 +1,18 @@
-import groupSchema, { IGroup } from '../models/Groups';
+import groupSchema, { IGroupMembers } from '../models/Groups';
 import usersSchema from '../models/Users';
 
 import AppError from '../errors/AppError';
 
+interface IRequest {
+  group_id: string;
+  user_nickname: string;
+}
+
 class RemoveUserFromGroupService {
-  public async execute(
-    group_id: string,
-    user_nickname: string,
-  ): Promise<IGroup> {
+  public async execute({
+    group_id,
+    user_nickname,
+  }: IRequest): Promise<IGroupMembers[]> {
     const group = await groupSchema.findById(group_id);
 
     if (!group) {
@@ -46,7 +51,7 @@ class RemoveUserFromGroupService {
       { $pull: { groups: { id: group.id } } },
     );
 
-    return updatedGroup;
+    return updatedGroup.members;
   }
 }
 

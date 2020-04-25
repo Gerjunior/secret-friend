@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import isNumber from 'is-number';
 import cleanDeep from 'clean-deep';
-import { Types } from 'mongoose';
 
 import groupMembersRouter from './groups.members.routes';
 
@@ -11,7 +10,11 @@ import CreateGroupService from '../services/CreateGroupService';
 import UpdateGroupService from '../services/UpdateGroupService';
 import DrawService from '../services/DrawService';
 
+import UsersRepository from '../repositories/UsersRepository';
+
 import AppError from '../errors/AppError';
+
+const usersRepository = new UsersRepository();
 
 const groupsRouter = Router();
 
@@ -25,6 +28,7 @@ groupsRouter.get('/', async (request, response) => {
     max_value,
     draw_date,
     reveal_date,
+    status,
   } = request.body;
 
   const convertedPage = isNumber(page) ? Number(page) : 1;
@@ -37,6 +41,7 @@ groupsRouter.get('/', async (request, response) => {
       max_value,
       draw_date,
       reveal_date,
+      status,
     }),
     { page: convertedPage, limit: 10 },
   );
@@ -58,7 +63,7 @@ groupsRouter.post('/', async (request, response) => {
     reveal_date,
   } = request.body;
 
-  const createGroup = new CreateGroupService();
+  const createGroup = new CreateGroupService(usersRepository);
 
   const group = await createGroup.execute({
     admin_nickname,
@@ -72,13 +77,13 @@ groupsRouter.post('/', async (request, response) => {
   return response.status(201).json(group);
 });
 
-groupsRouter.put('/:id', (request, response) => {
+groupsRouter.put('/:id', async (request, response) => {
   const { id } = request.params;
   const { name, min_value, max_value, draw_date, reveal_date } = request.body;
 
   const updateGroup = new UpdateGroupService();
 
-  const group = updateGroup.execute({
+  const group = await updateGroup.execute({
     id,
     name,
     min_value,

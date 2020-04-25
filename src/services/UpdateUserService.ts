@@ -1,4 +1,7 @@
-import userSchema, { IUser } from '../models/Users';
+import { compare } from 'bcrypt';
+import hash from '../utils/hash';
+
+import userSchema from '../models/Users';
 import groupSchema from '../models/Groups';
 
 import AppError from '../errors/AppError';
@@ -7,8 +10,17 @@ interface IRequest {
   id: string;
   name: string;
   last_name: string;
-  email: string;
+  password: string;
+  birth_date: Date;
+  description: string;
+}
+
+interface IResponse {
+  id: string;
+  name: string;
+  last_name: string;
   nickname: string;
+  email: string;
   birth_date: Date;
   description: string;
 }
@@ -18,30 +30,28 @@ class UpdateUserService {
     id,
     name,
     last_name,
-    email,
-    nickname,
+    password,
     birth_date,
     description,
-  }: IRequest): Promise<IUser> {
+  }: IRequest): Promise<IResponse> {
     const user = await userSchema.findById(id);
 
     if (!user) {
       throw new AppError('User not found.', 404);
     }
 
-    if (nickname !== user.nickname) {
-      throw new AppError('You cannot update your nickname (yet).', 400);
-    }
+    const compare_passwords = await compare(password, user.password);
 
-    if (email !== user.email) {
-      throw new AppError('You cannot update your email (yet).', 400);
-    }
+    const updated_password = compare_passwords
+      ? user.password
+      : await hash(password);
 
     const updatedUser = await userSchema.findByIdAndUpdate(
       id,
       {
         name,
         last_name,
+        password: updated_password,
         birth_date,
         description,
       },
@@ -56,14 +66,12 @@ class UpdateUserService {
     }
 
     await userSchema.updateMany(
-      { 'friends.nickname': { $eq: nickname } },
+      { 'friends.nickname': { $eq: user._id } },
       {
         $set: {
           'friends.$': {
             name,
             last_name,
-            email,
-            nickname,
             birth_date,
             description,
           },
@@ -72,14 +80,12 @@ class UpdateUserService {
     );
 
     await groupSchema.updateMany(
-      { 'members.nickname': { $eq: nickname } },
+      { 'members.nickname': { $eq: user._id } },
       {
         $set: {
           'members.$': {
             name,
             last_name,
-            email,
-            nickname,
             birth_date,
             description,
           },
@@ -87,7 +93,15 @@ class UpdateUserService {
       },
     );
 
-    return updatedUser;
+    return {
+      id,
+      name,
+      last_name,
+      nickname: user.nickname,
+      email: user.email,
+      description,
+      birth_date,
+    };
   }
 }
 

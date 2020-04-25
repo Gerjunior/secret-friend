@@ -12,18 +12,18 @@ export interface IGroup extends Document {
   created_at: Date;
   updated_at: Date;
   admin_nickname: string;
-  members: [
-    {
-      _id: string;
-      name: string;
-      nickname: string;
-      description: string;
-      birth_date: Date;
-      email: string;
-      wishes: [string] | undefined;
-      secret_friend: string | undefined;
-    },
-  ];
+  members: [IGroupMembers];
+}
+
+export interface IGroupMembers {
+  _id: string;
+  name: string;
+  nickname: string;
+  description: string;
+  birth_date: Date;
+  email: string;
+  wishes: [string] | undefined;
+  secret_friend: string | undefined;
 }
 
 export enum Status {

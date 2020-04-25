@@ -1,4 +1,6 @@
-import groupSchema, { IGroup } from '../models/Groups';
+import cleanDeep from 'clean-deep';
+
+import groupSchema, { IGroupMembers } from '../models/Groups';
 
 import AppError from '../errors/AppError';
 
@@ -11,6 +13,17 @@ interface IRequest {
   reveal_date: Date;
 }
 
+interface IResponse {
+  id: string;
+  name: string;
+  min_value: number;
+  max_value: number;
+  draw_date: Date;
+  reveal_date: Date;
+  admin_nickname: string;
+  members: [IGroupMembers];
+}
+
 class UpdateGroupService {
   public async execute({
     id,
@@ -19,22 +32,33 @@ class UpdateGroupService {
     max_value,
     draw_date,
     reveal_date,
-  }: IRequest): Promise<IGroup> {
-    const group = await groupSchema.findById(id);
+  }: IRequest): Promise<IResponse> {
+    const group = await groupSchema.findByIdAndUpdate(
+      id,
+      cleanDeep({
+        name,
+        min_value,
+        max_value,
+        draw_date,
+        reveal_date,
+      }),
+      { new: true },
+    );
 
     if (!group) {
       throw new AppError('There is no group with this id.', 404);
     }
 
-    await groupSchema.findByIdAndUpdate(id, {
-      name,
-      min_value,
-      max_value,
-      draw_date,
-      reveal_date,
-    });
-
-    return group;
+    return {
+      id,
+      name: group.name,
+      min_value: group.min_value,
+      max_value: group.max_value,
+      draw_date: group.draw_date,
+      reveal_date: group.reveal_date,
+      admin_nickname: group.admin_nickname,
+      members: group.members,
+    };
   }
 }
 

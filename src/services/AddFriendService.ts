@@ -1,9 +1,7 @@
-import { IUser } from '../models/Users';
+import { IUserFriends } from '../models/Users';
 
 import UsersRepository from '../repositories/UsersRepository';
 import AppError from '../errors/AppError';
-
-const usersRepository = new UsersRepository();
 
 interface IRequest {
   my_nickname: string;
@@ -11,12 +9,22 @@ interface IRequest {
 }
 
 class AddFriendService {
+  private usersRepository: UsersRepository;
+
+  constructor(usersRepository: UsersRepository) {
+    this.usersRepository = usersRepository;
+  }
+
   public async execute({
     my_nickname,
     user_nickname,
-  }: IRequest): Promise<IUser> {
-    const myProfile = await usersRepository.FindUserByNickname(my_nickname);
-    const userProfile = await usersRepository.FindUserByNickname(user_nickname);
+  }: IRequest): Promise<IUserFriends[]> {
+    const myProfile = await this.usersRepository.FindUserByNickname(
+      my_nickname,
+    );
+    const userProfile = await this.usersRepository.FindUserByNickname(
+      user_nickname,
+    );
 
     [myProfile, userProfile].forEach(profile => {
       if (!profile) {
@@ -32,7 +40,7 @@ class AddFriendService {
       });
     }
 
-    const updatedUser = await usersRepository.AddFriend(
+    const updatedUser = await this.usersRepository.AddFriend(
       my_nickname,
       user_nickname,
     );
@@ -44,9 +52,9 @@ class AddFriendService {
       );
     }
 
-    await usersRepository.AddFriend(user_nickname, my_nickname);
+    await this.usersRepository.AddFriend(user_nickname, my_nickname);
 
-    return updatedUser;
+    return updatedUser.friends;
   }
 }
 

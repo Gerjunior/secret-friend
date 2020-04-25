@@ -1,24 +1,33 @@
-import groupSchema, { IGroup, Status } from '../models/Groups';
+import groupSchema, { IGroupMembers, Status } from '../models/Groups';
 import usersSchema from '../models/Users';
 
 import UsersRepository from '../repositories/UsersRepository';
 
 import AppError from '../errors/AppError';
 
-const usersRepository = new UsersRepository();
+interface IRequest {
+  group_id: string;
+  user_nickname: string;
+}
 
 class AddUserToGroupService {
-  public async execute(
-    group_id: string,
-    user_nickname: string,
-  ): Promise<IGroup> {
+  private usersRepository: UsersRepository;
+
+  constructor(usersRepository: UsersRepository) {
+    this.usersRepository = usersRepository;
+  }
+
+  public async execute({
+    group_id,
+    user_nickname,
+  }: IRequest): Promise<IGroupMembers[]> {
     const group = await groupSchema.findById(group_id);
 
     if (!group) {
       throw new AppError('Group not found.', 404);
     }
 
-    const user = await usersRepository.FindUserByNickname(user_nickname);
+    const user = await this.usersRepository.FindUserByNickname(user_nickname);
 
     if (!user) {
       throw new AppError('No user with this nickname was found.', 404);
@@ -70,7 +79,7 @@ class AddUserToGroupService {
       { $push: { groups: updatedGroup } },
     );
 
-    return updatedGroup;
+    return updatedGroup.members;
   }
 }
 

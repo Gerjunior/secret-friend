@@ -1,11 +1,9 @@
-import { hash } from 'bcrypt';
+import hash from '../utils/hash';
 
 import AppError from '../errors/AppError';
 
-import userSchema, { IUser } from '../models/Users';
+import userSchema from '../models/Users';
 import UsersRepository from '../repositories/UsersRepository';
-
-const usersRepository = new UsersRepository();
 
 interface IRequest {
   name: string;
@@ -17,7 +15,23 @@ interface IRequest {
   description: string;
 }
 
+interface IResponse {
+  id: string;
+  name: string;
+  last_name: string;
+  email: string;
+  birth_date: Date;
+  nickname: string;
+  description: string;
+}
+
 class CreateUserService {
+  private usersRepository: UsersRepository;
+
+  constructor(usersRepository: UsersRepository) {
+    this.usersRepository = usersRepository;
+  }
+
   public async execute({
     name,
     last_name,
@@ -26,20 +40,22 @@ class CreateUserService {
     nickname,
     password,
     description,
-  }: IRequest): Promise<IUser> {
-    const emailExists = await usersRepository.FindUserByEmail(email);
+  }: IRequest): Promise<IResponse> {
+    const emailExists = await this.usersRepository.FindUserByEmail(email);
 
     if (emailExists) {
       throw new AppError('This email is already registered.', 400);
     }
 
-    const nicknameExists = await usersRepository.FindUserByNickname(nickname);
+    const nicknameExists = await this.usersRepository.FindUserByNickname(
+      nickname,
+    );
 
     if (nicknameExists) {
       throw new AppError('This nickname is already taken.', 400);
     }
 
-    const hashedPassword = await hash(password, 8);
+    const hashedPassword = await hash(password);
 
     const user = await userSchema.create({
       name,
@@ -51,7 +67,15 @@ class CreateUserService {
       description,
     });
 
-    return user;
+    return {
+      id: user._id,
+      last_name,
+      birth_date,
+      description,
+      email,
+      name,
+      nickname,
+    };
   }
 }
 

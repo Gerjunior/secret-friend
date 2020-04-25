@@ -28,6 +28,15 @@ export interface IUser extends Document {
   ];
 }
 
+export interface IUserFriends {
+  _id: string;
+  name: string;
+  nickname: string;
+  description: string;
+  birth_date: string;
+  email: string;
+}
+
 const UserSchema: Schema = new Schema(
   {
     name: { type: String, required: true },
