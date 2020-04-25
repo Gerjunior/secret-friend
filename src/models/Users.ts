@@ -9,23 +9,8 @@ export interface IUser extends Document {
   nickname: string;
   password: string;
   description: string;
-  friends: [
-    {
-      _id: string;
-      name: string;
-      nickname: string;
-      description: string;
-      birth_date: string;
-      email: string;
-    },
-  ];
-  groups: [
-    {
-      id: string;
-      name: string;
-      status: string;
-    },
-  ];
+  friends: [IUserFriends];
+  groups: [IUserGroups];
 }
 
 export interface IUserFriends {
@@ -35,6 +20,12 @@ export interface IUserFriends {
   description: string;
   birth_date: string;
   email: string;
+}
+
+export interface IUserGroups {
+  id: string;
+  name: string;
+  status: string;
 }
 
 const UserSchema: Schema = new Schema(

@@ -29,7 +29,7 @@ class UsersRepository {
     user_nickname: string,
   ): Promise<IUser | null> {
     const {
-      _id,
+      id: _id,
       name,
       birth_date,
       description,

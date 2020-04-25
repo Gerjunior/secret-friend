@@ -69,12 +69,12 @@ class CreateUserService {
 
     return {
       id: user._id,
-      last_name,
-      birth_date,
-      description,
-      email,
       name,
+      last_name,
       nickname,
+      email,
+      description,
+      birth_date,
     };
   }
 }

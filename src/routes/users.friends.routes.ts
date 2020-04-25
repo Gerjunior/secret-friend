@@ -5,23 +5,9 @@ import RemoveFriendService from '../services/RemoveFriendService';
 
 import UsersRepository from '../repositories/UsersRepository';
 
-import AppError from '../errors/AppError';
-
 const usersRepository = new UsersRepository();
 
 const userFriendsRouter = Router();
-
-userFriendsRouter.get('/', async (request, response) => {
-  const { nickname } = request.user;
-
-  const user = await usersRepository.FindUserByNickname(nickname);
-
-  if (!user) {
-    throw new AppError('No user with this nickname was found.', 404);
-  }
-
-  return response.json(user.friends);
-});
 
 userFriendsRouter.post('/add/:user_nickname', async (request, response) => {
   const { user_nickname } = request.params;
