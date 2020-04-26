@@ -2,8 +2,6 @@ import { Router } from 'express';
 import isNumber from 'is-number';
 import cleanDeep from 'clean-deep';
 
-import groupMembersRouter from './groups.members.routes';
-
 import groupSchema from '../models/Groups';
 
 import CreateGroupService from '../services/CreateGroupService';
@@ -11,12 +9,15 @@ import UpdateGroupService from '../services/UpdateGroupService';
 import DrawService from '../services/DrawService';
 
 import UsersRepository from '../repositories/UsersRepository';
-
 import AppError from '../errors/AppError';
+import ensureAuthenticated from '../middlewares/ensureAuthenticated';
+import groupMembersRouter from './groups.members.routes';
 
 const usersRepository = new UsersRepository();
 
 const groupsRouter = Router();
+
+groupsRouter.use(ensureAuthenticated);
 
 groupsRouter.get('/', async (request, response) => {
   const { page } = request.query;
@@ -121,9 +122,7 @@ groupsRouter.use(
   '/:id/members',
   (request, response, next) => {
     const { id } = request.params;
-    request.group = {
-      id,
-    };
+    request.group_id = id;
     next();
   },
   groupMembersRouter,

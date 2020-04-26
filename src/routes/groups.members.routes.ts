@@ -10,7 +10,7 @@ const groupMembersRouter = Router();
 
 groupMembersRouter.post('/add/:nickname', async (request, response) => {
   const { nickname } = request.params;
-  const { id } = request.group;
+  const id = request.group_id;
 
   const addUserToGroup = new AddUserToGroupService(usersRepository);
 
@@ -24,7 +24,7 @@ groupMembersRouter.post('/add/:nickname', async (request, response) => {
 
 groupMembersRouter.post('/remove/:nickname', async (request, response) => {
   const { nickname } = request.params;
-  const { id } = request.group;
+  const id = request.group_id;
 
   const removeUserFromGroup = new RemoveUserFromGroupService();
 

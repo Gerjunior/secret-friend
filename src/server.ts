@@ -13,7 +13,7 @@ app.use(cors());
 app.use(express.json());
 app.use(routes);
 
-mongoose.connect(process.env.connectionString || '', {
+mongoose.connect(process.env.connectionString, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useFindAndModify: false,
@@ -41,5 +41,5 @@ app.listen(3333, () => {
 });
 
 // TODO: express validations
-// TODO: JWT auth
 // TODO: tests
+// TODO: JWT roles

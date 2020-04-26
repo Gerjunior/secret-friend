@@ -11,7 +11,7 @@ const userFriendsRouter = Router();
 
 userFriendsRouter.post('/add/:user_nickname', async (request, response) => {
   const { user_nickname } = request.params;
-  const { nickname } = request.user;
+  const nickname = request.user_nickname;
 
   const addFriend = new AddFriendService(usersRepository);
 
@@ -26,7 +26,7 @@ userFriendsRouter.post('/add/:user_nickname', async (request, response) => {
 userFriendsRouter.post('/remove/:user_nickname', async (request, response) => {
   const { user_nickname } = request.params;
 
-  const my_nickname = request.user.nickname;
+  const my_nickname = request.user_nickname;
 
   const removeFriend = new RemoveFriendService(usersRepository);
 

@@ -3,20 +3,21 @@ import cleanDeep from 'clean-deep';
 import isNumber from 'is-number';
 
 import userSchema from '../models/Users';
-
 import userFriendsRouter from './users.friends.routes';
 
 import AppError from '../errors/AppError';
 
 import CreateUserService from '../services/CreateUserService';
 import UpdateUserService from '../services/UpdateUserService';
-
-import UsersRepository from '../repositories/UsersRepository';
 import GetUserByNicknameService from '../services/GetUserByNicknameService';
 
-const usersRepository = new UsersRepository();
+import ensureAuthenticated from '../middlewares/ensureAuthenticated';
+import UsersRepository from '../repositories/UsersRepository';
 
+const usersRepository = new UsersRepository();
 const usersRouter = Router();
+
+usersRouter.use(ensureAuthenticated);
 
 usersRouter.get('/', async (request, response) => {
   const { page } = request.query;
@@ -109,9 +110,7 @@ usersRouter.use(
   '/:my_nickname/friends',
   (request, response, next) => {
     const { my_nickname } = request.params;
-    request.user = {
-      nickname: my_nickname,
-    };
+    request.user_nickname = my_nickname;
     next();
   },
   userFriendsRouter,
