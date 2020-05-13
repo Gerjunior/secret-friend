@@ -1,41 +1,11 @@
 import { Router } from 'express';
 
-import AddFriendService from '../services/AddFriendService';
-import RemoveFriendService from '../services/RemoveFriendService';
-
-import UsersRepository from '../repositories/UsersRepository';
-
-const usersRepository = new UsersRepository();
+import UserFriendsController from '../controllers/UserFriendsController';
 
 const userFriendsRouter = Router();
+const userFriendsController = new UserFriendsController();
 
-userFriendsRouter.post('/add/:user_nickname', async (request, response) => {
-  const { user_nickname } = request.params;
-  const nickname = request.user_nickname;
-
-  const addFriend = new AddFriendService(usersRepository);
-
-  const user = await addFriend.execute({
-    my_nickname: nickname,
-    user_nickname,
-  });
-
-  return response.json(user);
-});
-
-userFriendsRouter.post('/remove/:user_nickname', async (request, response) => {
-  const { user_nickname } = request.params;
-
-  const my_nickname = request.user_nickname;
-
-  const removeFriend = new RemoveFriendService(usersRepository);
-
-  const updatedUser = await removeFriend.execute({
-    my_nickname,
-    user_nickname,
-  });
-
-  return response.json(updatedUser);
-});
+userFriendsRouter.post('/add/:user_nickname', userFriendsController.add);
+userFriendsRouter.post('/remove/:user_nickname', userFriendsController.remove);
 
 export default userFriendsRouter;

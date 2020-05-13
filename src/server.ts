@@ -41,5 +41,6 @@ app.listen(3333, () => {
 });
 
 // TODO: express validations
-// TODO: tests
+// TODO: tests (jest)
 // TODO: JWT roles
+// TODO: DDD
