@@ -1,6 +1,8 @@
 import { injectable, inject } from 'tsyringe';
 
-import userSchema, { IUser } from '@modules/users/infra/mongoose/schemas/Users';
+import userSchema from '@modules/users/infra/mongoose/schemas/Users';
+
+import IUser from '@modules/users/entities/IUser';
 import IUserFriends from '@modules/users/repositories/IUserFriendsRepository';
 import UsersRepository from './UsersRepository';
 
@@ -16,7 +18,7 @@ class UserFriendsRepository implements IUserFriends {
     user_nickname: string,
   ): Promise<IUser | undefined> {
     const {
-      id: _id,
+      user_id,
       name,
       birth_date,
       description,
@@ -29,9 +31,9 @@ class UserFriendsRepository implements IUserFriends {
       {
         $push: {
           friends: {
-            _id,
+            _id: user_id,
             name,
-            birth_date: birth_date.toString(),
+            birth_date: birth_date ? birth_date.toString() : birth_date,
             description,
             nickname,
             email,
@@ -58,6 +60,19 @@ class UserFriendsRepository implements IUserFriends {
     }
 
     return true;
+  }
+
+  public async removeFriend(
+    my_nickname: string,
+    user_nickname: string,
+  ): Promise<IUser | undefined> {
+    const updatedUser = await userSchema.findOneAndUpdate(
+      { nickname: my_nickname },
+      { $pull: { friends: { nickname: user_nickname } } },
+      { new: true },
+    );
+
+    return updatedUser || undefined;
   }
 }
 

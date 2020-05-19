@@ -1,8 +1,6 @@
 import { injectable, inject } from 'tsyringe';
 
-import userSchema from '@modules/users/infra/mongoose/schemas/Users';
-
-import groupSchema from '@modules/groups/infra/mongoose/schemas/Groups';
+import IUsersRepository from '@modules/users/repositories/IUsersRepository';
 
 import AppError from '@shared/errors/AppError';
 import IHashProvider from '@shared/container/providers/HashProvider/models/IHashProvider';
@@ -31,6 +29,9 @@ export default class UpdateUserService {
   constructor(
     @inject('HashProvider')
     private hashProvider: IHashProvider,
+
+    @inject('UsersRepository')
+    private usersRepository: IUsersRepository,
   ) {}
 
   public async execute({
@@ -41,7 +42,7 @@ export default class UpdateUserService {
     birth_date,
     description,
   }: IRequest): Promise<IResponse> {
-    const user = await userSchema.findById(id);
+    const user = await this.usersRepository.findById(id);
 
     if (!user) {
       throw new AppError('User not found.', 404);
@@ -56,17 +57,14 @@ export default class UpdateUserService {
       ? user.password
       : await this.hashProvider.hash(password);
 
-    const updatedUser = await userSchema.findByIdAndUpdate(
+    const updatedUser = await this.usersRepository.update({
       id,
-      {
-        name,
-        last_name,
-        password: updated_password,
-        birth_date,
-        description,
-      },
-      { new: true },
-    );
+      name,
+      last_name,
+      password: updated_password,
+      birth_date,
+      description,
+    });
 
     if (!updatedUser) {
       throw new AppError(
@@ -74,34 +72,6 @@ export default class UpdateUserService {
         400,
       );
     }
-
-    await userSchema.updateMany(
-      { 'friends.nickname': { $eq: user._id } },
-      {
-        $set: {
-          'friends.$': {
-            name,
-            last_name,
-            birth_date,
-            description,
-          },
-        },
-      },
-    );
-
-    await groupSchema.updateMany(
-      { 'members.nickname': { $eq: user._id } },
-      {
-        $set: {
-          'members.$': {
-            name,
-            last_name,
-            birth_date,
-            description,
-          },
-        },
-      },
-    );
 
     return {
       id,

@@ -1,13 +1,12 @@
 import { isBefore, parseISO } from 'date-fns';
 import { injectable, inject } from 'tsyringe';
 
-import groupSchema, {
-  IGroupMembers,
-} from '@modules/groups/infra/mongoose/schemas/Groups';
+import IGroupMembers from '@modules/groups/entities/IGroupMembers';
 import AppError from '@shared/errors/AppError';
 
 import IUsersRepository from '@modules/users/repositories/IUsersRepository';
-import IUserGroupsRepository from '@modules/users/repositories/IUserGroupsRepository';
+
+import IGroupRepository from '../repositories/IGroupsRepository';
 
 interface IRequest {
   admin_nickname: string;
@@ -19,14 +18,14 @@ interface IRequest {
 }
 
 interface IResponse {
-  id: string;
+  id?: string;
   name: string;
   status: string;
   admin_nickname: string;
-  min_value: number;
-  max_value: number;
-  draw_date: Date;
-  reveal_date: Date;
+  min_value?: number;
+  max_value?: number;
+  draw_date?: Date;
+  reveal_date?: Date;
   members: [IGroupMembers];
 }
 
@@ -36,8 +35,8 @@ export default class CreateGroupService {
     @inject('UsersRepository')
     private usersRepository: IUsersRepository,
 
-    @inject('UserGroupsRepository')
-    private userGroupsRepository: IUserGroupsRepository,
+    @inject('GroupsRepository')
+    private groupsRepository: IGroupRepository,
   ) {}
 
   public async execute({
@@ -76,28 +75,25 @@ export default class CreateGroupService {
       }
     }
 
-    const group = await groupSchema.create({
-      name,
-      max_value,
-      min_value,
-      reveal_date: parsed_reveal_date,
-      draw_date: parsed_draw_date,
-      admin_nickname,
-      members: [admin],
-    });
+    const group = await this.groupsRepository.create(
+      {
+        name,
+        max_value,
+        min_value,
+        reveal_date: parsed_reveal_date,
+        draw_date: parsed_draw_date,
+        admin_nickname,
+      },
+      admin,
+    );
 
-    await this.userGroupsRepository.addGroupToUser(group, admin_nickname);
+    if (!group) {
+      throw new AppError(
+        'There was an error creating the group. Please try again.',
+        400,
+      );
+    }
 
-    return {
-      id: group.id,
-      name,
-      status: group.status,
-      min_value,
-      max_value,
-      draw_date: group.draw_date,
-      reveal_date: group.reveal_date,
-      admin_nickname,
-      members: group.members,
-    };
+    return group;
   }
 }

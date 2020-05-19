@@ -1,6 +1,6 @@
 import { injectable, inject } from 'tsyringe';
 
-import { IUserFriends } from '@modules/users/infra/mongoose/schemas/Users';
+import IUserFriends from '@modules/users/entities/IUserFriends';
 
 import IUsersRepository from '@modules/users/repositories/IUsersRepository';
 import IUserFriendsRepository from '@modules/users/repositories/IUserFriendsRepository';

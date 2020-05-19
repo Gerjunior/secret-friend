@@ -23,7 +23,7 @@ export default class GroupMembersController {
     const { nickname } = request.params;
     const id = request.group_id;
 
-    const removeUserFromGroup = new RemoveUserFromGroupService();
+    const removeUserFromGroup = container.resolve(RemoveUserFromGroupService);
 
     const group = await removeUserFromGroup.execute({
       group_id: id,

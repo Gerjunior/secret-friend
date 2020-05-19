@@ -1,37 +1,8 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
+import IGroupBase, { Status } from '@modules/groups/entities/IGroup';
 
-export interface IGroup extends Document {
-  id: string;
-  name: string;
-  min_value: number;
-  max_value: number;
-  draw_date: Date;
-  reveal_date: Date;
-  status: string;
-  created_at: Date;
-  updated_at: Date;
-  admin_nickname: string;
-  members: [IGroupMembers];
-}
-
-export interface IGroupMembers {
-  _id: string;
-  name: string;
-  nickname: string;
-  description: string;
-  birth_date: Date;
-  email: string;
-  wishes: [string] | undefined;
-  secret_friend: string | undefined;
-}
-
-export enum Status {
-  Awaiting = 'A',
-  Drawn = 'D',
-  Finished = 'F',
-  Cancelled = 'C',
-}
+interface IGroup extends Document, IGroupBase {}
 
 const GroupSchema: Schema = new Schema(
   {

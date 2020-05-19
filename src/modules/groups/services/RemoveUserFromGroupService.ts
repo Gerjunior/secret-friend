@@ -1,7 +1,9 @@
-import groupSchema, {
-  IGroupMembers,
-} from '@modules/groups/infra/mongoose/schemas/Groups';
-import usersSchema from '@modules/users/infra/mongoose/schemas/Users';
+import { inject, injectable } from 'tsyringe';
+
+import IGroupMembers from '@modules/groups/entities/IGroupMembers';
+
+import IGroupRepository from '@modules/groups/repositories/IGroupsRepository';
+import IGroupMembersRepository from '@modules/groups/repositories/IGroupMembersRepository';
 
 import AppError from '@shared/errors/AppError';
 
@@ -10,35 +12,37 @@ interface IRequest {
   user_nickname: string;
 }
 
+@injectable()
 export default class RemoveUserFromGroupService {
+  constructor(
+    @inject('GroupsRepository')
+    private groupRepository: IGroupRepository,
+
+    @inject('GroupMembersRepository')
+    private groupMembersRepository: IGroupMembersRepository,
+  ) {}
+
   public async execute({
     group_id,
     user_nickname,
   }: IRequest): Promise<IGroupMembers[]> {
-    const group = await groupSchema.findById(group_id);
+    const group = await this.groupRepository.findById(group_id);
 
     if (!group) {
       throw new AppError('Group not found.', 404);
     }
 
-    const isMember = group.members.some(
+    const user = group.members.find(
       member => member.nickname === user_nickname,
     );
 
-    if (!isMember) {
+    if (!user) {
       throw new AppError('User not member of this group.', 400);
     }
 
-    const updatedGroup = await groupSchema.findByIdAndUpdate(
+    const updatedGroup = await this.groupMembersRepository.removeMember(
       group_id,
-      {
-        $pull: {
-          members: {
-            nickname: user_nickname,
-          },
-        },
-      },
-      { new: true },
+      user._id,
     );
 
     if (!updatedGroup) {
@@ -47,11 +51,6 @@ export default class RemoveUserFromGroupService {
         400,
       );
     }
-
-    await usersSchema.findOneAndUpdate(
-      { nickname: user_nickname },
-      { $pull: { groups: { id: group.id } } },
-    );
 
     return updatedGroup.members;
   }

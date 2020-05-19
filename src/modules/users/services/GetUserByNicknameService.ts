@@ -2,21 +2,19 @@ import { inject, injectable } from 'tsyringe';
 
 import IUsersRepository from '@modules/users/repositories/IUsersRepository';
 
-import {
-  IUserFriends,
-  IUserGroups,
-} from '@modules/users/infra/mongoose/schemas/Users';
+import IUserFriends from '@modules/users/entities/IUserFriends';
+import IUserGroups from '@modules/users/entities/IUserGroups';
 
 import AppError from '@shared/errors/AppError';
 
 interface IResponse {
   id: string;
   name: string;
-  last_name: string;
+  last_name?: string;
   email: string;
-  birth_date: Date;
+  birth_date?: Date;
   nickname: string;
-  description: string;
+  description?: string;
   friends: [IUserFriends];
   groups: [IUserGroups];
 }
@@ -36,7 +34,7 @@ export default class GetUserByNicknameService {
     }
 
     const {
-      _id,
+      user_id,
       name,
       last_name,
       email,
@@ -47,7 +45,7 @@ export default class GetUserByNicknameService {
     } = user;
 
     return {
-      id: _id,
+      id: user_id,
       name,
       last_name,
       email,

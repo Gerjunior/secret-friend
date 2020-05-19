@@ -2,19 +2,9 @@ import { inject, injectable } from 'tsyringe';
 
 import AppError from '@shared/errors/AppError';
 
-import userSchema from '@modules/users/infra/mongoose/schemas/Users';
 import IHashProvider from '@shared/container/providers/HashProvider/models/IHashProvider';
 import IUsersRepository from '@modules/users/repositories/IUsersRepository';
-
-interface IRequest {
-  name: string;
-  last_name: string;
-  email: string;
-  birth_date: Date;
-  nickname: string;
-  password: string;
-  description: string;
-}
+import ICreateUserDTO from '@modules/users/dtos/ICreateUserDTO';
 
 interface IResponse {
   id: string;
@@ -26,7 +16,7 @@ interface IResponse {
   description: string;
 }
 
-injectable();
+@injectable()
 export default class CreateUserService {
   constructor(
     @inject('UsersRepository')
@@ -44,7 +34,7 @@ export default class CreateUserService {
     nickname,
     password,
     description,
-  }: IRequest): Promise<IResponse> {
+  }: ICreateUserDTO): Promise<IResponse> {
     const emailExists = await this.usersRepository.findByEmail(email);
 
     if (emailExists) {
@@ -59,7 +49,7 @@ export default class CreateUserService {
 
     const hashedPassword = await this.hashProvider.hash(password);
 
-    const user = await userSchema.create({
+    const user = await this.usersRepository.create({
       name,
       last_name,
       email,

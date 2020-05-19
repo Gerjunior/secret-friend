@@ -1,12 +1,11 @@
 import { injectable, inject } from 'tsyringe';
 
-import groupSchema, {
-  IGroupMembers,
-  Status,
-} from '@modules/groups/infra/mongoose/schemas/Groups';
-import usersSchema from '@modules/users/infra/mongoose/schemas/Users';
-
+import IGroupRepository from '@modules/groups/repositories/IGroupsRepository';
+import IGroupMembersRepository from '@modules/groups/repositories/IGroupMembersRepository';
 import IUsersRepository from '@modules/users/repositories/IUsersRepository';
+
+import { Status } from '@modules/groups/entities/IGroup';
+import IGroupMembers from '@modules/groups/entities/IGroupMembers';
 
 import AppError from '@shared/errors/AppError';
 
@@ -20,13 +19,19 @@ export default class AddUserToGroupService {
   constructor(
     @inject('UsersRepository')
     private usersRepository: IUsersRepository,
+
+    @inject('GroupsRepository')
+    private groupsRepository: IGroupRepository,
+
+    @inject('GroupMembersRepository')
+    private groupMembersRepository: IGroupMembersRepository,
   ) {}
 
   public async execute({
     group_id,
     user_nickname,
   }: IRequest): Promise<IGroupMembers[]> {
-    const group = await groupSchema.findById(group_id);
+    const group = await this.groupsRepository.findById(group_id);
 
     if (!group) {
       throw new AppError('Group not found.', 404);
@@ -53,24 +58,16 @@ export default class AddUserToGroupService {
       );
     }
 
-    const updatedGroup = await groupSchema.findByIdAndUpdate(
+    const updatedGroup = await this.groupMembersRepository.addMember({
       group_id,
-      {
-        $push: {
-          members: {
-            _id: user.id,
-            name: user.name,
-            nickname: user.nickname,
-            email: user.email,
-            birth_date: user.birth_date,
-            description: user.description,
-            secret_friend: undefined,
-            wishes: undefined,
-          },
-        },
-      },
-      { new: true },
-    );
+      user_id: user.user_id,
+      name: user.name,
+      last_name: user.last_name,
+      nickname: user.nickname,
+      email: user.email,
+      birth_date: user.birth_date,
+      description: user.description,
+    });
 
     if (!updatedGroup) {
       throw new AppError(
@@ -78,11 +75,6 @@ export default class AddUserToGroupService {
         400,
       );
     }
-
-    await usersSchema.findOneAndUpdate(
-      { nickname: user_nickname },
-      { $push: { groups: updatedGroup } },
-    );
 
     return updatedGroup.members;
   }

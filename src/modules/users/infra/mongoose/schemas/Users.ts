@@ -1,24 +1,16 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 
-export interface IUser extends Document {
-  name: string;
-  last_name: string;
-  email: string;
-  birth_date: Date;
-  nickname: string;
-  password: string;
-  description: string;
-  friends: [IUserFriends];
-  groups: [IUserGroups];
-}
+import IUserBase from '@modules/users/entities/IUser';
+
+export interface IUser extends Document, IUserBase {}
 
 export interface IUserFriends {
   _id: string;
   name: string;
   nickname: string;
-  description: string;
-  birth_date: string;
+  description?: string;
+  birth_date?: string;
   email: string;
 }
 

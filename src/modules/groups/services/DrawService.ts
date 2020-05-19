@@ -1,25 +1,33 @@
-import groupSchema, {
-  Status,
-  IGroupMembers,
-} from '@modules/groups/infra/mongoose/schemas/Groups';
+import { injectable, inject } from 'tsyringe';
+
+import IGroupMembers from '@modules/groups/entities/IGroupMembers';
+import { Status } from '@modules/groups/entities/IGroup';
+
+import IGroupsRepository from '@modules/groups/repositories/IGroupsRepository';
 
 import AppError from '@shared/errors/AppError';
 
 interface IResponse {
   id: string;
   name: string;
-  min_value: number;
-  max_value: number;
-  draw_date: Date;
-  reveal_date: Date;
+  min_value?: number;
+  max_value?: number;
+  draw_date?: Date;
+  reveal_date?: Date;
   status: string;
   admin_nickname: string;
   members: [IGroupMembers];
 }
 
+@injectable()
 export default class DrawService {
+  constructor(
+    @inject('GroupsRepository')
+    private groupsRepository: IGroupsRepository,
+  ) {}
+
   public async execute(group_id: string): Promise<IResponse> {
-    const group = await groupSchema.findById(group_id);
+    const group = await this.groupsRepository.findById(group_id);
 
     if (!group) {
       throw new AppError('Group not found.', 404);
@@ -94,11 +102,15 @@ export default class DrawService {
       member.secret_friend = secret_friend.nickname;
     });
 
-    group.status = Status.Drawn;
-    group.draw_date = new Date();
-
-    const updatedGroup = await groupSchema.findByIdAndUpdate(group_id, group, {
-      new: true,
+    const updatedGroup = await this.groupsRepository.update({
+      group_id,
+      draw_date: new Date(),
+      max_value: group.max_value,
+      min_value: group.min_value,
+      name: group.name,
+      reveal_date: group.reveal_date,
+      status: Status.Drawn,
+      members: group.members,
     });
 
     if (!updatedGroup) {
@@ -109,7 +121,6 @@ export default class DrawService {
     }
 
     const {
-      id,
       name,
       status,
       admin_nickname,
@@ -121,7 +132,7 @@ export default class DrawService {
     } = updatedGroup;
 
     return {
-      id,
+      id: group_id,
       name,
       status,
       admin_nickname,

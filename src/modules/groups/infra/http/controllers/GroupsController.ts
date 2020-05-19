@@ -73,7 +73,7 @@ export default class GroupsController {
     const { id } = request.params;
     const { name, min_value, max_value, draw_date, reveal_date } = request.body;
 
-    const updateGroup = new UpdateGroupService();
+    const updateGroup = container.resolve(UpdateGroupService);
 
     const group = await updateGroup.execute({
       id,
@@ -102,7 +102,7 @@ export default class GroupsController {
   public async draw(request: Request, response: Response): Promise<Response> {
     const { id } = request.params;
 
-    const draw = new DrawService();
+    const draw = container.resolve(DrawService);
 
     const group = await draw.execute(id);
 

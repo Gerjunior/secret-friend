@@ -1,10 +1,9 @@
 import { inject, injectable } from 'tsyringe';
 
 import IUsersRepository from '@modules/users/repositories/IUsersRepository';
+import IUserFriendsRepository from '@modules/users/repositories/IUserFriendsRepository';
 
-import usersSchema, {
-  IUserFriends,
-} from '@modules/users/infra/mongoose/schemas/Users';
+import { IUserFriends } from '@modules/users/infra/mongoose/schemas/Users';
 
 import AppError from '@shared/errors/AppError';
 
@@ -18,6 +17,9 @@ export default class RemoveFriendService {
   constructor(
     @inject('UsersRepository')
     private usersRepository: IUsersRepository,
+
+    @inject('UserFriendsRepository')
+    private userFriendsRepository: IUserFriendsRepository,
   ) {}
 
   public async execute({
@@ -41,10 +43,9 @@ export default class RemoveFriendService {
       throw new AppError('You are not friends.', 400);
     }
 
-    const updatedUser = await usersSchema.findOneAndUpdate(
-      { nickname: my_nickname },
-      { $pull: { friends: { nickname: user_nickname } } },
-      { new: true },
+    const updatedUser = await this.userFriendsRepository.removeFriend(
+      my_nickname,
+      user_nickname,
     );
 
     if (!updatedUser) {
@@ -54,11 +55,7 @@ export default class RemoveFriendService {
       );
     }
 
-    await usersSchema.findOneAndUpdate(
-      { nickname: user_nickname },
-      { $pull: { friends: { nickname: my_nickname } } },
-      { new: true },
-    );
+    await this.userFriendsRepository.removeFriend(user_nickname, my_nickname);
 
     return updatedUser.friends;
   }

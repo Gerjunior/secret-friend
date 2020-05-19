@@ -35,7 +35,7 @@ export default class AuthenticateUserService {
     }
 
     const token = sign({}, process.env.jwtSecret, {
-      subject: user.id,
+      subject: user._id,
       expiresIn: process.env.jwtExpiresIn,
     });
 
