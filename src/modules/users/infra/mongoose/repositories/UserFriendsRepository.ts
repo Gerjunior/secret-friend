@@ -18,7 +18,7 @@ class UserFriendsRepository implements IUserFriends {
     user_nickname: string,
   ): Promise<IUser | undefined> {
     const {
-      user_id,
+      _id,
       name,
       birth_date,
       description,
@@ -31,7 +31,7 @@ class UserFriendsRepository implements IUserFriends {
       {
         $push: {
           friends: {
-            _id: user_id,
+            _id,
             name,
             birth_date: birth_date ? birth_date.toString() : birth_date,
             description,

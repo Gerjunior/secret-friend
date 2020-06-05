@@ -4,6 +4,7 @@ import { injectable, inject } from 'tsyringe';
 
 import IUsersRepository from '@modules/users/repositories/IUsersRepository';
 import AppError from '@shared/errors/AppError';
+import IUser from '../entities/IUser';
 
 interface IRequest {
   nickname: string;
@@ -12,6 +13,7 @@ interface IRequest {
 
 interface IResponse {
   token: string;
+  user: IUser;
 }
 
 @injectable()
@@ -34,13 +36,16 @@ export default class AuthenticateUserService {
       throw new AppError('Wrong nickname/password combination.', 400);
     }
 
+    const user_id = String(user._id);
+
     const token = sign({}, process.env.jwtSecret, {
-      subject: user._id,
+      subject: user_id,
       expiresIn: process.env.jwtExpiresIn,
     });
 
     return {
       token,
+      user,
     };
   }
 }

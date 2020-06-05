@@ -37,11 +37,11 @@ export default class GroupRepository implements IGroupRepository {
     }
 
     await UserSchema.findOneAndUpdate(
-      { admin_nickname },
+      { nickname: admin_nickname },
       {
         $push: {
           groups: {
-            id: group.id,
+            id: group._id,
             name: group.name,
             status: group.status,
           },

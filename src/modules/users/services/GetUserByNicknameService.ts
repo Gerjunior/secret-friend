@@ -8,7 +8,7 @@ import IUserGroups from '@modules/users/entities/IUserGroups';
 import AppError from '@shared/errors/AppError';
 
 interface IResponse {
-  id: string;
+  _id: string;
   name: string;
   last_name?: string;
   email: string;
@@ -34,7 +34,7 @@ export default class GetUserByNicknameService {
     }
 
     const {
-      user_id,
+      _id,
       name,
       last_name,
       email,
@@ -45,7 +45,7 @@ export default class GetUserByNicknameService {
     } = user;
 
     return {
-      id: user_id,
+      _id,
       name,
       last_name,
       email,

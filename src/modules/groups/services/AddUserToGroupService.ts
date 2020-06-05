@@ -60,7 +60,7 @@ export default class AddUserToGroupService {
 
     const updatedGroup = await this.groupMembersRepository.addMember({
       group_id,
-      user_id: user.user_id,
+      user_id: user._id,
       name: user.name,
       last_name: user.last_name,
       nickname: user.nickname,

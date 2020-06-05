@@ -56,7 +56,7 @@ export default class GroupMembersRepository implements IGroupMembersRepository {
     );
 
     return {
-      group_id,
+      _id: group_id,
       status,
       name,
       admin_nickname,
