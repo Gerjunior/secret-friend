@@ -15,7 +15,9 @@ class GroupRepository implements IGroupRepository {
   }
 
   findById(group_id: string): Promise<Group | undefined> {
-    return this.ormRepository.findOne(group_id);
+    return this.ormRepository.findOne(group_id, {
+      relations: ['admin', 'members', 'members.user'],
+    });
   }
 
   async create(data: ICreateGroupDTO): Promise<Group | undefined> {
@@ -26,8 +28,13 @@ class GroupRepository implements IGroupRepository {
     return group;
   }
 
-  update(data: IUpdateGroupDTO): Promise<Group | undefined> {
-    return this.ormRepository.save(data);
+  async update({
+    group_id,
+    ...data
+  }: IUpdateGroupDTO): Promise<Group | undefined> {
+    const group = (await this.ormRepository.findOne(group_id)) as Group;
+
+    return this.ormRepository.save({ ...group, ...data });
   }
 
   async delete(group_id: string): Promise<boolean> {

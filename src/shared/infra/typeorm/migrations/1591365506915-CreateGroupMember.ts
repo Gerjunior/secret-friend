@@ -5,7 +5,7 @@ export default class CreateGroupMember1591365506915
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'group_member',
+        name: 'group_user',
         columns: [
           {
             name: 'group_id',
@@ -18,19 +18,19 @@ export default class CreateGroupMember1591365506915
             isPrimary: true,
           },
           {
-            name: 'created_at',
-            type: 'timestamp',
-            default: 'now()',
+            name: 'secret_friend_id',
+            type: 'uuid',
+            isNullable: true,
           },
           {
-            name: 'updated_at',
+            name: 'member_since',
             type: 'timestamp',
             default: 'now()',
           },
         ],
         foreignKeys: [
           {
-            name: 'GroupToGroupMember',
+            name: 'GroupToGroupUser',
             referencedTableName: 'group',
             referencedColumnNames: ['id'],
             columnNames: ['group_id'],
@@ -38,10 +38,18 @@ export default class CreateGroupMember1591365506915
             onUpdate: 'CASCADE',
           },
           {
-            name: 'UserToGroupMember',
+            name: 'UserToGroupUser',
             referencedTableName: 'user',
             referencedColumnNames: ['id'],
             columnNames: ['user_id'],
+            onDelete: 'CASCADE',
+            onUpdate: 'CASCADE',
+          },
+          {
+            name: 'SecretUserToGroupUser',
+            referencedTableName: 'user',
+            referencedColumnNames: ['id'],
+            columnNames: ['secret_friend_id'],
             onDelete: 'CASCADE',
             onUpdate: 'CASCADE',
           },
@@ -51,9 +59,9 @@ export default class CreateGroupMember1591365506915
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropForeignKey('group_member', 'GroupToGroupMember');
-    await queryRunner.dropForeignKey('group_member', 'UserToGroupMember');
+    await queryRunner.dropForeignKey('group_user', 'GroupToGroupUser');
+    await queryRunner.dropForeignKey('group_user', 'UserToGroupUser');
 
-    await queryRunner.dropTable('group_member');
+    await queryRunner.dropTable('group_user');
   }
 }

@@ -1,36 +1,38 @@
 import {
   Entity,
   CreateDateColumn,
-  UpdateDateColumn,
   JoinColumn,
   ManyToOne,
   PrimaryColumn,
+  Column,
 } from 'typeorm';
 
 import User from '@modules/users/infra/typeorm/entities/User';
 import Group from '@modules/groups/infra/typeorm/entities/Group';
+import { Exclude } from 'class-transformer';
 
-@Entity('group_member')
-class GroupMember {
+@Entity('group_user')
+class GroupUser {
+  @Exclude()
   @PrimaryColumn()
   group_id: string;
 
-  @ManyToOne(() => Group, group => group.members, { primary: true })
+  @ManyToOne(() => Group, { primary: true })
   @JoinColumn({ name: 'group_id' })
-  group: Promise<Group>;
+  groups: Group[];
 
   @PrimaryColumn()
   user_id: string;
 
-  @ManyToOne(() => User, user => user.groups, { primary: true })
+  @ManyToOne(() => User, { primary: true })
   @JoinColumn({ name: 'user_id' })
-  user: Promise<User>;
+  user: User;
+
+  @Column()
+  secret_friend_id: string;
 
   @CreateDateColumn()
-  created_at: Date;
-
-  @UpdateDateColumn()
-  updated_at: Date;
+  member_since: Date;
 }
 
-export default GroupMember;
+export default GroupUser;

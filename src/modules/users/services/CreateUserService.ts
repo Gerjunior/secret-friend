@@ -33,12 +33,6 @@ export default class CreateUserService {
       throw new AppError('This email is already registered.', 400);
     }
 
-    const nicknameExists = await this.UserRepository.findByNickname(nickname);
-
-    if (nicknameExists) {
-      throw new AppError('This nickname is already taken.', 400);
-    }
-
     const hashedPassword = await this.hashProvider.hash(password);
 
     const user = await this.UserRepository.create({

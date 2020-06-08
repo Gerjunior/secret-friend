@@ -5,12 +5,11 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
-  JoinTable,
 } from 'typeorm';
 
 import { Exclude } from 'class-transformer';
 
-import GroupMember from '@modules/groups/infra/typeorm/entities/GroupMember';
+import GroupUser from '@modules/groups/infra/typeorm/entities/GroupUser';
 
 @Entity('user')
 class User {
@@ -39,9 +38,8 @@ class User {
   @Column()
   description: string;
 
-  @OneToMany(() => GroupMember, groupMember => groupMember.user)
-  @JoinTable()
-  groups: Promise<GroupMember[]>;
+  @OneToMany(() => GroupUser, groupUser => groupUser.groups)
+  groups: GroupUser[];
 
   @CreateDateColumn()
   @Exclude()

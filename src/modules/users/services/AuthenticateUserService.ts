@@ -7,7 +7,7 @@ import AppError from '@shared/errors/AppError';
 import User from '../infra/typeorm/entities/User';
 
 interface IRequest {
-  nickname: string;
+  email: string;
   password: string;
 }
 
@@ -23,8 +23,8 @@ export default class AuthenticateUserService {
     private UserRepository: IUserRepository,
   ) {}
 
-  public async execute({ nickname, password }: IRequest): Promise<IResponse> {
-    const user = await this.UserRepository.findByNickname(nickname);
+  public async execute({ email, password }: IRequest): Promise<IResponse> {
+    const user = await this.UserRepository.findByEmail(email);
 
     if (!user) {
       throw new AppError('Wrong nickname/password combination.', 400);

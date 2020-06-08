@@ -3,7 +3,6 @@ import { Repository, getRepository } from 'typeorm';
 import IUserRepository from '@modules/users/repositories/IUserRepository';
 
 import ICreateUserDTO from '@modules/users/dtos/ICreateUserDTO';
-import IUpdateUserDTO from '@modules/users/dtos/IUpdateUserDTO';
 
 import User from '../entities/User';
 
@@ -16,16 +15,6 @@ class UserRepository implements IUserRepository {
 
   async findById(user_id: string): Promise<User | undefined> {
     return this.ormRepository.findOne(user_id);
-  }
-
-  async findByNickname(user_nickname: string): Promise<User | undefined> {
-    const user = await this.ormRepository.findOne({
-      where: {
-        nickname: user_nickname,
-      },
-    });
-
-    return user;
   }
 
   async findByEmail(user_email: string): Promise<User | undefined> {
@@ -62,8 +51,12 @@ class UserRepository implements IUserRepository {
     return user;
   }
 
-  update(data: IUpdateUserDTO): Promise<User | undefined> {
-    return this.ormRepository.save(data);
+  async update(data: User): Promise<User | undefined> {
+    await this.ormRepository.save(data);
+
+    const user_id = data.id;
+
+    return this.findById(user_id);
   }
 
   async delete(user_id: string): Promise<boolean> {

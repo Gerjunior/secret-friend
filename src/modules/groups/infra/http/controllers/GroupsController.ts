@@ -1,14 +1,14 @@
 import { Request, Response } from 'express';
-import { container, injectable } from 'tsyringe';
+import { container } from 'tsyringe';
 import { classToClass } from 'class-transformer';
 
 import CreateGroupService from '@modules/groups/services/CreateGroupService';
 import UpdateGroupService from '@modules/groups/services/UpdateGroupService';
 import ShowGroupService from '@modules/groups/services/ShowGroupService';
+import DeleteGroupService from '@modules/groups/services/DeleteGroupService';
 
 import DrawService from '@modules/groups/services/DrawService';
 
-@injectable()
 export default class GroupsController {
   public async findById(
     request: Request,
@@ -24,19 +24,14 @@ export default class GroupsController {
   }
 
   public async create(request: Request, response: Response): Promise<Response> {
-    const {
-      admin_id,
-      name,
-      min_value,
-      max_value,
-      draw_date,
-      reveal_date,
-    } = request.body;
+    const { id } = request.user;
+
+    const { name, min_value, max_value, draw_date, reveal_date } = request.body;
 
     const createGroup = container.resolve(CreateGroupService);
 
     const group = await createGroup.execute({
-      admin_id,
+      admin_id: id,
       name,
       min_value,
       max_value,
@@ -48,13 +43,15 @@ export default class GroupsController {
   }
 
   public async update(request: Request, response: Response): Promise<Response> {
-    const { id } = request.params;
+    const { id } = request.user;
+    const { group_id } = request.params;
     const { name, min_value, max_value, draw_date, reveal_date } = request.body;
 
     const updateGroup = container.resolve(UpdateGroupService);
 
     const group = await updateGroup.execute({
-      id,
+      group_id,
+      admin_id: id,
       name,
       min_value,
       max_value,
@@ -66,23 +63,23 @@ export default class GroupsController {
   }
 
   public async delete(request: Request, response: Response): Promise<Response> {
-    const { id } = request.params;
+    const admin_id = request.user.id;
+    const group_id = request.params.id;
 
-    // const group = await this.GroupRepository.delete(id);
+    const deleteGroup = container.resolve(DeleteGroupService);
 
-    // if (!group) {
-    //   throw new AppError('No group was found with this id.', 404);
-    // }
+    await deleteGroup.execute({ admin_id, group_id });
 
     return response.status(204).send();
   }
 
   public async draw(request: Request, response: Response): Promise<Response> {
-    const { id } = request.params;
+    const user_id = request.user.id;
+    const group_id = request.params.id;
 
     const draw = container.resolve(DrawService);
 
-    const group = await draw.execute(id);
+    const group = await draw.execute({ user_id, group_id });
 
     return response.json(classToClass(group));
   }

@@ -7,11 +7,13 @@ import {
   ManyToOne,
   JoinColumn,
   OneToMany,
-  JoinTable,
 } from 'typeorm';
 
+import Status from '@modules/groups/entities/enums/GroupStatus';
+
 import User from '@modules/users/infra/typeorm/entities/User';
-import GroupMember from './GroupMember';
+import { Expose } from 'class-transformer';
+import GroupUser from './GroupUser';
 
 @Entity('group')
 class Group {
@@ -40,20 +42,30 @@ class Group {
   @Column()
   reveal_date: Date;
 
-  @Column({ default: 'A' }) // TODO: Expose status description
-  status: string;
+  @Column({ name: 'status', default: 'A' })
+  status_flag: string;
 
-  @OneToMany(() => GroupMember, groupMember => groupMember.group, {
-    eager: true,
-  })
-  @JoinTable()
-  members: Promise<GroupMember[]>;
+  @OneToMany(() => GroupUser, groupUser => groupUser.groups)
+  members: GroupUser[];
 
   @CreateDateColumn()
   created_at: Date;
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  @Expose({ name: 'status' })
+  getStatus(): string {
+    if (Status.Awaiting === this.status_flag) {
+      return 'Awaiting';
+    }
+
+    if (Status.Drawn === this.status_flag) {
+      return 'Drawn';
+    }
+
+    return 'Finished';
+  }
 }
 
 export default Group;

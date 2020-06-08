@@ -36,8 +36,7 @@ export default class CreateUser1591358550056 implements MigrationInterface {
           {
             name: 'nickname',
             type: 'varchar',
-            isNullable: false,
-            isUnique: true,
+            isNullable: true,
           },
           {
             name: 'password',

@@ -9,7 +9,7 @@ import GroupStatus from '@modules/groups/entities/enums/GroupStatus';
 import IUserRepository from '@modules/users/repositories/IUserRepository';
 
 import IGroupRepository from '../repositories/IGroupRepository';
-import IGroupMembersRepository from '../repositories/IGroupMembersRepository';
+import IGroupUsersRepository from '../repositories/IGroupUsersRepository';
 
 interface IRequest {
   admin_id: string;
@@ -29,8 +29,8 @@ export default class CreateGroupService {
     @inject('GroupRepository')
     private groupRepository: IGroupRepository,
 
-    @inject('GroupMembersRepository')
-    private groupMembersRepository: IGroupMembersRepository,
+    @inject('GroupUsersRepository')
+    private groupUsersRepository: IGroupUsersRepository,
   ) {}
 
   public async execute({
@@ -44,7 +44,7 @@ export default class CreateGroupService {
     const admin = await this.userRepository.findById(admin_id);
 
     if (!admin) {
-      throw new AppError('No user with this nickname could be found.', 404);
+      throw new AppError('User not found.', 404);
     }
 
     if (min_value && max_value && min_value > max_value) {
@@ -76,7 +76,7 @@ export default class CreateGroupService {
       reveal_date: parsed_reveal_date,
       draw_date: parsed_draw_date,
       admin_id: admin.id,
-      status: GroupStatus.Awaiting,
+      status_flag: GroupStatus.Awaiting,
     });
 
     if (!group) {
@@ -86,7 +86,7 @@ export default class CreateGroupService {
       );
     }
 
-    await this.groupMembersRepository.addMember(group.id, admin.id);
+    await this.groupUsersRepository.addMember(group.id, admin.id);
 
     return group;
   }

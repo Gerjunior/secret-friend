@@ -6,12 +6,12 @@ import AuthenticateUserService from '@modules/users/services/AuthenticateUserSer
 
 export default class SessionsController {
   public async create(request: Request, response: Response): Promise<Response> {
-    const { nickname, password } = request.body;
+    const { email, password } = request.body;
 
     const authenticateUser = container.resolve(AuthenticateUserService);
 
     const { token, user } = await authenticateUser.execute({
-      nickname,
+      email,
       password,
     });
 

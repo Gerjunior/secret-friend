@@ -1,4 +1,5 @@
 import { inject, injectable } from 'tsyringe';
+import { classToClass } from 'class-transformer';
 
 import AppError from '@shared/errors/AppError';
 
@@ -20,6 +21,6 @@ export default class ShowGroupService {
       throw new AppError('Group not found.', 404);
     }
 
-    return group;
+    return classToClass(group);
   }
 }

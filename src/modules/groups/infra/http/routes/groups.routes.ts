@@ -1,7 +1,7 @@
 import { Router } from 'express';
 
 import ensureAuthenticated from '@modules/users/infra/http/middlewares/ensureAuthenticated';
-import groupMembersRouter from './groups.members.routes';
+import GroupUsersRouter from './groups.members.routes';
 
 import GroupsController from '../controllers/GroupsController';
 
@@ -17,6 +17,6 @@ groupsRouter.put('/:id', groupsController.update);
 groupsRouter.delete('/:id', groupsController.delete);
 groupsRouter.post('/:id/draw', groupsController.draw);
 
-groupsRouter.use('/members', groupMembersRouter);
+groupsRouter.use('/members', GroupUsersRouter);
 
 export default groupsRouter;

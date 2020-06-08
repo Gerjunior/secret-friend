@@ -5,5 +5,5 @@ export default interface ICreateGroupDTO {
   reveal_date?: Date;
   draw_date?: Date;
   admin_id: string;
-  status: string;
+  status_flag: string;
 }

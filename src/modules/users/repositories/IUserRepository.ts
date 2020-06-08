@@ -4,7 +4,6 @@ import IUpdateUserDTO from '@modules/users/dtos/IUpdateUserDTO';
 
 export default interface IUserRepository {
   findById(user_id: string): Promise<User | undefined>;
-  findByNickname(user_nickname: string): Promise<User | undefined>;
   findByEmail(user_email: string): Promise<User | undefined>;
   create(data: ICreateUserDTO): Promise<User>;
   update(data: IUpdateUserDTO): Promise<User | undefined>;

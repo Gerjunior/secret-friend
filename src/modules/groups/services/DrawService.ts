@@ -1,31 +1,40 @@
 import { injectable, inject } from 'tsyringe';
 
-import IGroupRepository from '@modules/groups/repositories/IGroupRepository';
-
 import Group from '@modules/groups/infra/typeorm/entities/Group';
 import GroupStatus from '@modules/groups/entities/enums/GroupStatus';
 
 import AppError from '@shared/errors/AppError';
-import IGroupSecretFriendRepository from '../repositories/IGroupSecretFriendRepository';
 
+import IGroupRepository from '@modules/groups/repositories/IGroupRepository';
+import IGroupUsersRepository from '../repositories/IGroupUsersRepository';
+import GroupUser from '../infra/typeorm/entities/GroupUser';
+
+interface IRequest {
+  user_id: string;
+  group_id: string;
+}
 @injectable()
 export default class DrawService {
   constructor(
     @inject('GroupRepository')
     private groupRepository: IGroupRepository,
 
-    @inject('GroupSecretFriendRepository')
-    private groupSecretFriendRepository: IGroupSecretFriendRepository,
+    @inject('GroupUsersRepository')
+    private groupUsersRepository: IGroupUsersRepository,
   ) {}
 
-  public async execute(group_id: string): Promise<Group> {
+  public async execute({ group_id, user_id }: IRequest): Promise<Group> {
     const group = await this.groupRepository.findById(group_id);
 
     if (!group) {
       throw new AppError('Group not found.', 404);
     }
 
-    if (group.status !== GroupStatus.Awaiting) {
+    if (group.admin_id !== user_id) {
+      throw new AppError('You are not allowed to realize the draw.');
+    }
+
+    if (group.status_flag !== GroupStatus.Awaiting) {
       throw new AppError(
         'The draw has already been carried out for this group.',
         400,
@@ -38,7 +47,7 @@ export default class DrawService {
 
     const drawObject = group.members.map(member => {
       return {
-        nickname: member.user.nickname,
+        id: member.user.id,
         secret_friend: '',
         already_chosen: false,
       };
@@ -47,30 +56,31 @@ export default class DrawService {
     for (let i = 0; i < drawObject.length; i += 1) {
       while (!drawObject[i].secret_friend) {
         const secret_friend =
-          drawObject[Math.floor(Math.random() * drawObject.length)];
+          drawObject[Math.floor(Math.random() * drawObject.length)]; // GET A RANDOM INDEX FROM DRAWOBJECT
 
         if (
-          drawObject[i].nickname === secret_friend.nickname ||
-          secret_friend.already_chosen
+          drawObject[i].id === secret_friend.id || // VERIFY IF THE SELECTED SECRET FRIEND ID IS NOT THE SAME AS THE FIRST USER
+          secret_friend.already_chosen // VERIFY IF THE SELECTED SECRET FRIEND IS NOT ALREALDY CHOSEN
         ) {
           continue;
         }
 
-        drawObject[i].secret_friend = secret_friend.nickname;
+        drawObject[i].secret_friend = secret_friend.id;
+
         const secret_friend_index = group.members.findIndex(
-          member => member.user.nickname === secret_friend.nickname,
+          member => member.user.id === secret_friend.id,
         );
         drawObject[secret_friend_index].already_chosen = true;
       }
     }
 
     const draw_result = drawObject.map(user => {
-      return { nickname: user.nickname, secret_friend: user.secret_friend };
+      return { id: user.id, secret_friend: user.secret_friend };
     });
 
     group.members.forEach(async member => {
       const draw_result_item = draw_result.find(
-        item => item.nickname === member.user.nickname,
+        item => item.id === member.user.id,
       );
 
       if (!draw_result_item) {
@@ -81,17 +91,10 @@ export default class DrawService {
       }
 
       const secret_friend = group.members.find(
-        user => user.user.nickname === draw_result_item.secret_friend,
-      );
+        user => user.user_id === draw_result_item.secret_friend,
+      ) as GroupUser;
 
-      if (!secret_friend) {
-        throw new AppError(
-          'This error should never occur. Just here because of TypeScript rules.',
-          400,
-        );
-      }
-
-      await this.groupSecretFriendRepository.insert({
+      await this.groupUsersRepository.updateSecretFriend({
         group_id,
         user_id: member.user_id,
         secret_friend_id: secret_friend.user_id,

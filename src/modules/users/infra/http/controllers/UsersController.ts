@@ -5,6 +5,7 @@ import { classToClass } from 'class-transformer';
 import CreateUserService from '@modules/users/services/CreateUserService';
 import UpdateUserService from '@modules/users/services/UpdateUserService';
 import GetUserByIdService from '@modules/users/services/GetUserByIdService';
+import DeleteUserService from '@modules/users/services/DeleteUserService';
 
 @injectable()
 export default class UsersController {
@@ -48,15 +49,23 @@ export default class UsersController {
   }
 
   public async update(request: Request, response: Response): Promise<Response> {
-    const { id } = request.params;
+    const { id } = request.user;
 
-    const { name, last_name, birth_date, password, description } = request.body;
+    const {
+      name,
+      last_name,
+      birth_date,
+      password,
+      description,
+      first_name,
+    } = request.body;
 
     const updateUser = container.resolve(UpdateUserService);
 
     const user = await updateUser.execute({
       id,
       name,
+      first_name,
       last_name,
       password,
       birth_date,
@@ -67,7 +76,11 @@ export default class UsersController {
   }
 
   public async delete(request: Request, response: Response): Promise<Response> {
-    const { id } = request.params;
+    const { id } = request.user;
+
+    const deleteUser = container.resolve(DeleteUserService);
+
+    await deleteUser.execute(id);
 
     return response.status(204).send();
   }

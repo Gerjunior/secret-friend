@@ -1,7 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 
 import IGroupRepository from '@modules/groups/repositories/IGroupRepository';
-import IGroupMembersRepository from '@modules/groups/repositories/IGroupMembersRepository';
+import IGroupUsersRepository from '@modules/groups/repositories/IGroupUsersRepository';
 
 import AppError from '@shared/errors/AppError';
 
@@ -14,26 +14,26 @@ interface IRequest {
 export default class RemoveUserFromGroupService {
   constructor(
     @inject('GroupRepository')
-    private GroupRepository: IGroupRepository,
+    private groupRepository: IGroupRepository,
 
-    @inject('GroupMembersRepository')
-    private groupMembersRepository: IGroupMembersRepository,
+    @inject('GroupUsersRepository')
+    private groupUsersRepository: IGroupUsersRepository,
   ) {}
 
   public async execute({ group_id, user_id }: IRequest): Promise<boolean> {
-    const group = await this.GroupRepository.findById(group_id);
+    const group = await this.groupRepository.findById(group_id);
 
     if (!group) {
       throw new AppError('Group not found.', 404);
     }
 
-    const user = group.members.find(member => member.user.id === user_id);
+    const user = group.members.find(member => member.user_id === user_id);
 
     if (!user) {
       throw new AppError('User not member of this group.', 400);
     }
 
-    const removedMember = await this.groupMembersRepository.removeMember(
+    const removedMember = await this.groupUsersRepository.removeMember(
       group_id,
       user.user_id,
     );
@@ -48,3 +48,5 @@ export default class RemoveUserFromGroupService {
     return removedMember;
   }
 }
+
+// TODO: Removing the admin will result in group deletion
