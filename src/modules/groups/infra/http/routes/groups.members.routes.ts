@@ -1,11 +1,11 @@
 import { Router } from 'express';
 
-import GroupMembersController from '../controllers/GroupMembersController';
+import GroupUsersController from '../controllers/GroupUsersController';
 
-const groupMembersController = new GroupMembersController();
-const groupMembersRouter = Router();
+const groupUsersController = new GroupUsersController();
+const GroupUsersRouter = Router();
 
-groupMembersRouter.post('/add/:nickname', groupMembersController.add);
-groupMembersRouter.post('/remove/:nickname', groupMembersController.remove);
+GroupUsersRouter.post('/add', groupUsersController.add);
+GroupUsersRouter.post('/remove', groupUsersController.remove);
 
-export default groupMembersRouter;
+export default GroupUsersRouter;

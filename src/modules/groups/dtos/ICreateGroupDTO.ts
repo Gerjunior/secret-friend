@@ -4,5 +4,6 @@ export default interface ICreateGroupDTO {
   min_value?: number;
   reveal_date?: Date;
   draw_date?: Date;
-  admin_nickname: string;
+  admin_id: string;
+  status_flag: string;
 }

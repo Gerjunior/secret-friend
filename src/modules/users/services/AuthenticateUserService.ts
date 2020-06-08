@@ -2,29 +2,29 @@ import { compare } from 'bcrypt';
 import { sign } from 'jsonwebtoken';
 import { injectable, inject } from 'tsyringe';
 
-import IUsersRepository from '@modules/users/repositories/IUsersRepository';
+import IUserRepository from '@modules/users/repositories/IUserRepository';
 import AppError from '@shared/errors/AppError';
-import IUser from '../entities/IUser';
+import User from '../infra/typeorm/entities/User';
 
 interface IRequest {
-  nickname: string;
+  email: string;
   password: string;
 }
 
 interface IResponse {
   token: string;
-  user: IUser;
+  user: User;
 }
 
 @injectable()
 export default class AuthenticateUserService {
   constructor(
-    @inject('UsersRepository')
-    private usersRepository: IUsersRepository,
+    @inject('UserRepository')
+    private UserRepository: IUserRepository,
   ) {}
 
-  public async execute({ nickname, password }: IRequest): Promise<IResponse> {
-    const user = await this.usersRepository.findByNickname(nickname);
+  public async execute({ email, password }: IRequest): Promise<IResponse> {
+    const user = await this.UserRepository.findByEmail(email);
 
     if (!user) {
       throw new AppError('Wrong nickname/password combination.', 400);
@@ -36,7 +36,7 @@ export default class AuthenticateUserService {
       throw new AppError('Wrong nickname/password combination.', 400);
     }
 
-    const user_id = String(user._id);
+    const user_id = String(user.id);
 
     const token = sign({}, process.env.jwtSecret, {
       subject: user_id,
