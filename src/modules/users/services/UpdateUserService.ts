@@ -1,9 +1,11 @@
 import { injectable, inject } from 'tsyringe';
 
-import IUsersRepository from '@modules/users/repositories/IUsersRepository';
+import IUserRepository from '@modules/users/repositories/IUserRepository';
 
 import AppError from '@shared/errors/AppError';
 import IHashProvider from '@shared/container/providers/HashProvider/models/IHashProvider';
+
+import User from '../infra/typeorm/entities/User';
 
 interface IRequest {
   id: string;
@@ -14,24 +16,14 @@ interface IRequest {
   description: string;
 }
 
-interface IResponse {
-  id: string;
-  name: string;
-  last_name: string;
-  nickname: string;
-  email: string;
-  birth_date: Date;
-  description: string;
-}
-
 @injectable()
 export default class UpdateUserService {
   constructor(
     @inject('HashProvider')
     private hashProvider: IHashProvider,
 
-    @inject('UsersRepository')
-    private usersRepository: IUsersRepository,
+    @inject('UserRepository')
+    private UserRepository: IUserRepository,
   ) {}
 
   public async execute({
@@ -41,23 +33,20 @@ export default class UpdateUserService {
     password,
     birth_date,
     description,
-  }: IRequest): Promise<IResponse> {
-    const user = await this.usersRepository.findById(id);
+  }: IRequest): Promise<User> {
+    const user = await this.UserRepository.findById(id);
 
     if (!user) {
       throw new AppError('User not found.', 404);
     }
 
-    const compare_passwords = this.hashProvider.compare(
-      password,
-      user.password,
-    );
+    const password_match = this.hashProvider.compare(password, user.password);
 
-    const updated_password = compare_passwords
+    const updated_password = password_match
       ? user.password
       : await this.hashProvider.hash(password);
 
-    const updatedUser = await this.usersRepository.update({
+    const updatedUser = await this.UserRepository.update({
       id,
       name,
       last_name,
@@ -73,14 +62,6 @@ export default class UpdateUserService {
       );
     }
 
-    return {
-      id,
-      name,
-      last_name,
-      nickname: user.nickname,
-      email: user.email,
-      description,
-      birth_date,
-    };
+    return updatedUser;
   }
 }

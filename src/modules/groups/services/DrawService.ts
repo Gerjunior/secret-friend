@@ -1,39 +1,31 @@
 import { injectable, inject } from 'tsyringe';
 
-import IGroupMembers from '@modules/groups/entities/IGroupMembers';
-import { Status } from '@modules/groups/entities/IGroup';
+import IGroupRepository from '@modules/groups/repositories/IGroupRepository';
 
-import IGroupsRepository from '@modules/groups/repositories/IGroupsRepository';
+import Group from '@modules/groups/infra/typeorm/entities/Group';
+import GroupStatus from '@modules/groups/entities/enums/GroupStatus';
 
 import AppError from '@shared/errors/AppError';
-
-interface IResponse {
-  id: string;
-  name: string;
-  min_value?: number;
-  max_value?: number;
-  draw_date?: Date;
-  reveal_date?: Date;
-  status: string;
-  admin_nickname: string;
-  members: [IGroupMembers];
-}
+import IGroupSecretFriendRepository from '../repositories/IGroupSecretFriendRepository';
 
 @injectable()
 export default class DrawService {
   constructor(
-    @inject('GroupsRepository')
-    private groupsRepository: IGroupsRepository,
+    @inject('GroupRepository')
+    private groupRepository: IGroupRepository,
+
+    @inject('GroupSecretFriendRepository')
+    private groupSecretFriendRepository: IGroupSecretFriendRepository,
   ) {}
 
-  public async execute(group_id: string): Promise<IResponse> {
-    const group = await this.groupsRepository.findById(group_id);
+  public async execute(group_id: string): Promise<Group> {
+    const group = await this.groupRepository.findById(group_id);
 
     if (!group) {
       throw new AppError('Group not found.', 404);
     }
 
-    if (group.status !== Status.Awaiting) {
+    if (group.status !== GroupStatus.Awaiting) {
       throw new AppError(
         'The draw has already been carried out for this group.',
         400,
@@ -46,7 +38,7 @@ export default class DrawService {
 
     const drawObject = group.members.map(member => {
       return {
-        nickname: member.nickname,
+        nickname: member.user.nickname,
         secret_friend: '',
         already_chosen: false,
       };
@@ -66,7 +58,7 @@ export default class DrawService {
 
         drawObject[i].secret_friend = secret_friend.nickname;
         const secret_friend_index = group.members.findIndex(
-          member => member.nickname === secret_friend.nickname,
+          member => member.user.nickname === secret_friend.nickname,
         );
         drawObject[secret_friend_index].already_chosen = true;
       }
@@ -76,9 +68,9 @@ export default class DrawService {
       return { nickname: user.nickname, secret_friend: user.secret_friend };
     });
 
-    group.members.forEach(member => {
+    group.members.forEach(async member => {
       const draw_result_item = draw_result.find(
-        item => item.nickname === member.nickname,
+        item => item.nickname === member.user.nickname,
       );
 
       if (!draw_result_item) {
@@ -89,7 +81,7 @@ export default class DrawService {
       }
 
       const secret_friend = group.members.find(
-        user => user.nickname === draw_result_item.secret_friend,
+        user => user.user.nickname === draw_result_item.secret_friend,
       );
 
       if (!secret_friend) {
@@ -99,18 +91,17 @@ export default class DrawService {
         );
       }
 
-      member.secret_friend = secret_friend.nickname;
+      await this.groupSecretFriendRepository.insert({
+        group_id,
+        user_id: member.user_id,
+        secret_friend_id: secret_friend.user_id,
+      });
     });
 
-    const updatedGroup = await this.groupsRepository.update({
+    const updatedGroup = await this.groupRepository.update({
       group_id,
       draw_date: new Date(),
-      max_value: group.max_value,
-      min_value: group.min_value,
-      name: group.name,
-      reveal_date: group.reveal_date,
-      status: Status.Drawn,
-      members: group.members,
+      status: GroupStatus.Drawn,
     });
 
     if (!updatedGroup) {
@@ -120,27 +111,6 @@ export default class DrawService {
       );
     }
 
-    const {
-      name,
-      status,
-      admin_nickname,
-      draw_date,
-      reveal_date,
-      min_value,
-      max_value,
-      members,
-    } = updatedGroup;
-
-    return {
-      id: group_id,
-      name,
-      status,
-      admin_nickname,
-      draw_date,
-      reveal_date,
-      min_value,
-      max_value,
-      members,
-    };
+    return updatedGroup;
   }
 }

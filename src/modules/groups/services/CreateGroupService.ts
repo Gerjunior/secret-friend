@@ -1,15 +1,18 @@
 import { isBefore, parseISO } from 'date-fns';
 import { injectable, inject } from 'tsyringe';
 
-import IGroupMembers from '@modules/groups/entities/IGroupMembers';
+import Group from '@modules/groups/infra/typeorm/entities/Group';
+
 import AppError from '@shared/errors/AppError';
+import GroupStatus from '@modules/groups/entities/enums/GroupStatus';
 
-import IUsersRepository from '@modules/users/repositories/IUsersRepository';
+import IUserRepository from '@modules/users/repositories/IUserRepository';
 
-import IGroupRepository from '../repositories/IGroupsRepository';
+import IGroupRepository from '../repositories/IGroupRepository';
+import IGroupMembersRepository from '../repositories/IGroupMembersRepository';
 
 interface IRequest {
-  admin_nickname: string;
+  admin_id: string;
   name: string;
   min_value: number;
   max_value: number;
@@ -17,43 +20,34 @@ interface IRequest {
   reveal_date: string;
 }
 
-interface IResponse {
-  id?: string;
-  name: string;
-  status: string;
-  admin_nickname: string;
-  min_value?: number;
-  max_value?: number;
-  draw_date?: Date;
-  reveal_date?: Date;
-  members: [IGroupMembers];
-}
-
 @injectable()
 export default class CreateGroupService {
   constructor(
-    @inject('UsersRepository')
-    private usersRepository: IUsersRepository,
+    @inject('UserRepository')
+    private userRepository: IUserRepository,
 
-    @inject('GroupsRepository')
-    private groupsRepository: IGroupRepository,
+    @inject('GroupRepository')
+    private groupRepository: IGroupRepository,
+
+    @inject('GroupMembersRepository')
+    private groupMembersRepository: IGroupMembersRepository,
   ) {}
 
   public async execute({
-    admin_nickname,
-    name = 'UndefinedGroup',
+    admin_id,
+    name,
     draw_date,
     reveal_date,
-    max_value = Infinity,
-    min_value = 0,
-  }: IRequest): Promise<IResponse> {
-    const admin = await this.usersRepository.findByNickname(admin_nickname);
+    max_value,
+    min_value,
+  }: IRequest): Promise<Group> {
+    const admin = await this.userRepository.findById(admin_id);
 
     if (!admin) {
       throw new AppError('No user with this nickname could be found.', 404);
     }
 
-    if (min_value > max_value) {
+    if (min_value && max_value && min_value > max_value) {
       throw new AppError(
         'The minimum value cannot be greater than the maximum value or lesser than 0.',
         400,
@@ -75,17 +69,15 @@ export default class CreateGroupService {
       }
     }
 
-    const group = await this.groupsRepository.create(
-      {
-        name,
-        max_value,
-        min_value,
-        reveal_date: parsed_reveal_date,
-        draw_date: parsed_draw_date,
-        admin_nickname,
-      },
-      admin,
-    );
+    const group = await this.groupRepository.create({
+      name,
+      max_value,
+      min_value,
+      reveal_date: parsed_reveal_date,
+      draw_date: parsed_draw_date,
+      admin_id: admin.id,
+      status: GroupStatus.Awaiting,
+    });
 
     if (!group) {
       throw new AppError(
@@ -93,6 +85,8 @@ export default class CreateGroupService {
         400,
       );
     }
+
+    await this.groupMembersRepository.addMember(group.id, admin.id);
 
     return group;
   }

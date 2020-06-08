@@ -1,9 +1,8 @@
 import { inject, injectable } from 'tsyringe';
-import cleanDeep from 'clean-deep';
 
-import IGroupsRepository from '@modules/groups/repositories/IGroupsRepository';
+import IGroupRepository from '@modules/groups/repositories/IGroupRepository';
 
-import IGroupMembers from '@modules/groups/entities/IGroupMembers';
+import Group from '@modules/groups/infra/typeorm/entities/Group';
 
 import AppError from '@shared/errors/AppError';
 
@@ -16,22 +15,11 @@ interface IRequest {
   reveal_date?: Date;
 }
 
-interface IResponse {
-  id?: string;
-  name?: string;
-  min_value?: number;
-  max_value?: number;
-  draw_date?: Date;
-  reveal_date?: Date;
-  admin_nickname?: string;
-  members?: [IGroupMembers];
-}
-
 injectable();
 export default class UpdateGroupService {
   constructor(
-    @inject('GroupsRepository')
-    private groupsRepository: IGroupsRepository,
+    @inject('GroupRepository')
+    private GroupRepository: IGroupRepository,
   ) {}
 
   public async execute({
@@ -41,8 +29,8 @@ export default class UpdateGroupService {
     max_value,
     draw_date,
     reveal_date,
-  }: IRequest): Promise<IResponse> {
-    const group = await this.groupsRepository.update({
+  }: IRequest): Promise<Group> {
+    const group = await this.GroupRepository.update({
       group_id: id,
       draw_date,
       max_value,
@@ -55,6 +43,6 @@ export default class UpdateGroupService {
       throw new AppError('There is no group with this id.', 404);
     }
 
-    return cleanDeep(group);
+    return group;
   }
 }

@@ -11,20 +11,12 @@ const groupsRouter = Router();
 
 groupsRouter.use(ensureAuthenticated);
 
-groupsRouter.get('/', groupsController.get);
+groupsRouter.get('/:id', groupsController.findById);
 groupsRouter.post('/', groupsController.create);
 groupsRouter.put('/:id', groupsController.update);
 groupsRouter.delete('/:id', groupsController.delete);
 groupsRouter.post('/:id/draw', groupsController.draw);
 
-groupsRouter.use(
-  '/:id/members',
-  (request, response, next) => {
-    const { id } = request.params;
-    request.group_id = id;
-    next();
-  },
-  groupMembersRouter,
-);
+groupsRouter.use('/members', groupMembersRouter);
 
 export default groupsRouter;

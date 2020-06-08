@@ -2,34 +2,31 @@ import { container } from 'tsyringe';
 
 import './providers';
 
-import IUsersRepository from '@modules/users/repositories/IUsersRepository';
-import UsersRepository from '@modules/users/infra/mongoose/repositories/UsersRepository';
+import IUserRepository from '@modules/users/repositories/IUserRepository';
+import UserRepository from '@modules/users/infra/typeorm/repositories/UserRepository';
 
-import IUserFriendsRepository from '@modules/users/repositories/IUserFriendsRepository';
-import UserFriendsRepository from '@modules/users/infra/mongoose/repositories/UserFriendsRepository';
-
-import IGroupsRepository from '@modules/groups/repositories/IGroupsRepository';
-import GroupsRepository from '@modules/groups/infra/mongoose/repositories/GroupsRepository';
+import IGroupRepository from '@modules/groups/repositories/IGroupRepository';
+import GroupRepository from '@modules/groups/infra/typeorm/repositories/GroupRepository';
 
 import IGroupMembersRepository from '@modules/groups/repositories/IGroupMembersRepository';
-import GroupMembersRepository from '@modules/groups/infra/mongoose/repositories/GroupMembersRepository';
+import GroupMembersRepository from '@modules/groups/infra/typeorm/repositories/GroupMemberRepository';
 
-container.registerSingleton<IUsersRepository>(
-  'UsersRepository',
-  UsersRepository,
-);
+import IGroupSecretFriendRepository from '@modules/groups/repositories/IGroupSecretFriendRepository';
+import GroupSecretFriendRepository from '@modules/groups/infra/typeorm/repositories/GroupSecretFriendRepository';
 
-container.registerSingleton<IUserFriendsRepository>(
-  'UserFriendsRepository',
-  UserFriendsRepository,
-);
+container.registerSingleton<IUserRepository>('UserRepository', UserRepository);
 
-container.registerSingleton<IGroupsRepository>(
-  'GroupsRepository',
-  GroupsRepository,
+container.registerSingleton<IGroupRepository>(
+  'GroupRepository',
+  GroupRepository,
 );
 
 container.registerSingleton<IGroupMembersRepository>(
   'GroupMembersRepository',
   GroupMembersRepository,
+);
+
+container.registerSingleton<IGroupSecretFriendRepository>(
+  'GroupSecretFriendRepository',
+  GroupSecretFriendRepository,
 );

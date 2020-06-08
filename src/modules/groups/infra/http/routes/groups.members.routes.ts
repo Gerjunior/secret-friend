@@ -5,7 +5,7 @@ import GroupMembersController from '../controllers/GroupMembersController';
 const groupMembersController = new GroupMembersController();
 const groupMembersRouter = Router();
 
-groupMembersRouter.post('/add/:nickname', groupMembersController.add);
-groupMembersRouter.post('/remove/:nickname', groupMembersController.remove);
+groupMembersRouter.post('/add', groupMembersController.add);
+groupMembersRouter.post('/remove', groupMembersController.remove);
 
 export default groupMembersRouter;

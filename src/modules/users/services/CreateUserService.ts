@@ -3,45 +3,37 @@ import { inject, injectable } from 'tsyringe';
 import AppError from '@shared/errors/AppError';
 
 import IHashProvider from '@shared/container/providers/HashProvider/models/IHashProvider';
-import IUsersRepository from '@modules/users/repositories/IUsersRepository';
+import IUserRepository from '@modules/users/repositories/IUserRepository';
 import ICreateUserDTO from '@modules/users/dtos/ICreateUserDTO';
 
-interface IResponse {
-  id: string;
-  name: string;
-  last_name: string;
-  email: string;
-  birth_date: Date;
-  nickname: string;
-  description: string;
-}
+import User from '../infra/typeorm/entities/User';
 
 @injectable()
 export default class CreateUserService {
   constructor(
-    @inject('UsersRepository')
-    private usersRepository: IUsersRepository,
+    @inject('UserRepository')
+    private UserRepository: IUserRepository,
 
     @inject('HashProvider')
     private hashProvider: IHashProvider,
   ) {}
 
   public async execute({
-    name,
+    first_name,
     last_name,
     email,
     birth_date,
     nickname,
     password,
     description,
-  }: ICreateUserDTO): Promise<IResponse> {
-    const emailExists = await this.usersRepository.findByEmail(email);
+  }: ICreateUserDTO): Promise<User> {
+    const emailExists = await this.UserRepository.findByEmail(email);
 
     if (emailExists) {
       throw new AppError('This email is already registered.', 400);
     }
 
-    const nicknameExists = await this.usersRepository.findByNickname(nickname);
+    const nicknameExists = await this.UserRepository.findByNickname(nickname);
 
     if (nicknameExists) {
       throw new AppError('This nickname is already taken.', 400);
@@ -49,8 +41,8 @@ export default class CreateUserService {
 
     const hashedPassword = await this.hashProvider.hash(password);
 
-    const user = await this.usersRepository.create({
-      name,
+    const user = await this.UserRepository.create({
+      first_name,
       last_name,
       email,
       birth_date,
@@ -59,14 +51,6 @@ export default class CreateUserService {
       description,
     });
 
-    return {
-      id: user._id,
-      name,
-      last_name,
-      nickname,
-      email,
-      description,
-      birth_date,
-    };
+    return user;
   }
 }

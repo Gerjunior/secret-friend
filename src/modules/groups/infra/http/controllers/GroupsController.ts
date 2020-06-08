@@ -1,53 +1,31 @@
 import { Request, Response } from 'express';
-import isNumber from 'is-number';
-import cleanDeep from 'clean-deep';
-import { container } from 'tsyringe';
+import { container, injectable } from 'tsyringe';
+import { classToClass } from 'class-transformer';
 
 import CreateGroupService from '@modules/groups/services/CreateGroupService';
 import UpdateGroupService from '@modules/groups/services/UpdateGroupService';
+import ShowGroupService from '@modules/groups/services/ShowGroupService';
+
 import DrawService from '@modules/groups/services/DrawService';
-import AppError from '@shared/errors/AppError';
-import groupSchema from '../../mongoose/schemas/Groups';
 
+@injectable()
 export default class GroupsController {
-  public async get(request: Request, response: Response): Promise<Response> {
-    const { page } = request.query;
+  public async findById(
+    request: Request,
+    response: Response,
+  ): Promise<Response> {
+    const { group_id } = request.params;
 
-    const {
-      group_id,
-      name,
-      min_value,
-      max_value,
-      draw_date,
-      reveal_date,
-      status,
-    } = request.body;
+    const showGroup = container.resolve(ShowGroupService);
 
-    const convertedPage = isNumber(page) ? Number(page) : 1;
-
-    const group = await groupSchema.paginate(
-      cleanDeep({
-        _id: group_id,
-        name,
-        min_value,
-        max_value,
-        draw_date,
-        reveal_date,
-        status,
-      }),
-      { page: convertedPage, limit: 10 },
-    );
-
-    if (group.docs.length === 0) {
-      throw new AppError('No groups found with those parameters', 404);
-    }
+    const group = await showGroup.execute(group_id);
 
     return response.json(group);
   }
 
   public async create(request: Request, response: Response): Promise<Response> {
     const {
-      admin_nickname,
+      admin_id,
       name,
       min_value,
       max_value,
@@ -58,7 +36,7 @@ export default class GroupsController {
     const createGroup = container.resolve(CreateGroupService);
 
     const group = await createGroup.execute({
-      admin_nickname,
+      admin_id,
       name,
       min_value,
       max_value,
@@ -66,7 +44,7 @@ export default class GroupsController {
       reveal_date,
     });
 
-    return response.status(201).json(group);
+    return response.status(201).json(classToClass(group));
   }
 
   public async update(request: Request, response: Response): Promise<Response> {
@@ -84,17 +62,17 @@ export default class GroupsController {
       reveal_date,
     });
 
-    return response.json(group);
+    return response.json(classToClass(group));
   }
 
   public async delete(request: Request, response: Response): Promise<Response> {
     const { id } = request.params;
 
-    const group = await groupSchema.findByIdAndDelete(id);
+    // const group = await this.GroupRepository.delete(id);
 
-    if (!group) {
-      throw new AppError('No group was found with this id.', 404);
-    }
+    // if (!group) {
+    //   throw new AppError('No group was found with this id.', 404);
+    // }
 
     return response.status(204).send();
   }
@@ -106,6 +84,6 @@ export default class GroupsController {
 
     const group = await draw.execute(id);
 
-    return response.json(group);
+    return response.json(classToClass(group));
   }
 }

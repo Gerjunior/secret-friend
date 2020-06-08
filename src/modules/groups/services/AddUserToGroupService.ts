@@ -1,81 +1,73 @@
 import { injectable, inject } from 'tsyringe';
 
-import IGroupRepository from '@modules/groups/repositories/IGroupsRepository';
+import IGroupRepository from '@modules/groups/repositories/IGroupRepository';
 import IGroupMembersRepository from '@modules/groups/repositories/IGroupMembersRepository';
-import IUsersRepository from '@modules/users/repositories/IUsersRepository';
+import IUserRepository from '@modules/users/repositories/IUserRepository';
 
-import { Status } from '@modules/groups/entities/IGroup';
-import IGroupMembers from '@modules/groups/entities/IGroupMembers';
+import GroupStatus from '@modules/groups/entities/enums/GroupStatus';
 
 import AppError from '@shared/errors/AppError';
+import Group from '../infra/typeorm/entities/Group';
 
 interface IRequest {
   group_id: string;
-  user_nickname: string;
+  user_id: string;
 }
 
 @injectable()
 export default class AddUserToGroupService {
   constructor(
-    @inject('UsersRepository')
-    private usersRepository: IUsersRepository,
+    @inject('UserRepository')
+    private userRepository: IUserRepository,
 
-    @inject('GroupsRepository')
-    private groupsRepository: IGroupRepository,
+    @inject('GroupRepository')
+    private groupRepository: IGroupRepository,
 
     @inject('GroupMembersRepository')
     private groupMembersRepository: IGroupMembersRepository,
   ) {}
 
-  public async execute({
-    group_id,
-    user_nickname,
-  }: IRequest): Promise<IGroupMembers[]> {
-    const group = await this.groupsRepository.findById(group_id);
+  public async execute({ group_id, user_id }: IRequest): Promise<Group> {
+    const group = await this.groupRepository.findById(group_id);
 
     if (!group) {
       throw new AppError('Group not found.', 404);
     }
 
-    const user = await this.usersRepository.findByNickname(user_nickname);
+    const user = await this.userRepository.findById(user_id);
 
     if (!user) {
-      throw new AppError('No user with this nickname was found.', 404);
+      throw new AppError('User not found.', 404);
     }
 
-    const isMemberAlready = group.members.some(
-      member => member.nickname === user_nickname,
+    const isMemberAlready = await this.groupMembersRepository.findByUserAndGroupIds(
+      group_id,
+      user_id,
     );
 
     if (isMemberAlready) {
       throw new AppError('User already member of this group.', 400);
     }
 
-    if (group.status !== Status.Awaiting) {
+    if (group.status !== GroupStatus.Awaiting) {
       throw new AppError(
         'You cannot join this group because the draw has already been carried out.',
         400,
       );
     }
 
-    const updatedGroup = await this.groupMembersRepository.addMember({
+    const updatedGroupMember = await this.groupMembersRepository.addMember(
       group_id,
-      user_id: user._id,
-      name: user.name,
-      last_name: user.last_name,
-      nickname: user.nickname,
-      email: user.email,
-      birth_date: user.birth_date,
-      description: user.description,
-    });
+      user_id,
+    );
 
-    if (!updatedGroup) {
+    if (!updatedGroupMember) {
       throw new AppError(
         'An unexpected error happened while trying to add a user to the group. Please try again later.',
         400,
       );
     }
 
-    return updatedGroup.members;
+    return group;
   }
 }
