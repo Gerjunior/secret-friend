@@ -12,11 +12,11 @@ export default class GroupsController {
     request: Request,
     response: Response,
   ): Promise<Response> {
-    const { group_id } = request.params;
+    const { id } = request.params;
 
     const showGroup = container.resolve(ShowGroupService);
 
-    const group = await showGroup.execute(group_id);
+    const group = await showGroup.execute(id);
 
     return response.json(group);
   }

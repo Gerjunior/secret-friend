@@ -4,9 +4,9 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
-  ManyToOne,
-  JoinColumn,
   OneToMany,
+  JoinColumn,
+  ManyToOne,
 } from 'typeorm';
 
 import Status from '@modules/groups/entities/enums/GroupStatus';
