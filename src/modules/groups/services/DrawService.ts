@@ -6,7 +6,9 @@ import GroupStatus from '@modules/groups/entities/enums/GroupStatus';
 import AppError from '@shared/errors/AppError';
 
 import IGroupRepository from '@modules/groups/repositories/IGroupRepository';
+import ISecretFriendRepository from '../repositories/ISecretFriendRepository';
 import IGroupUsersRepository from '../repositories/IGroupUsersRepository';
+
 import GroupUser from '../infra/typeorm/entities/GroupUser';
 
 interface IRequest {
@@ -21,6 +23,9 @@ export default class DrawService {
 
     @inject('GroupUsersRepository')
     private groupUsersRepository: IGroupUsersRepository,
+
+    @inject('SecretFriendRepository')
+    private secretFriendRepository: ISecretFriendRepository,
   ) {}
 
   public async execute({ group_id, user_id }: IRequest): Promise<Group> {
@@ -94,7 +99,7 @@ export default class DrawService {
         user => user.user_id === draw_result_item.secret_friend,
       ) as GroupUser;
 
-      await this.groupUsersRepository.updateSecretFriend({
+      await this.secretFriendRepository.updateSecretFriend({
         group_id,
         user_id: member.user_id,
         secret_friend_id: secret_friend.user_id,
@@ -104,7 +109,7 @@ export default class DrawService {
     const updatedGroup = await this.groupRepository.update({
       group_id,
       draw_date: new Date(),
-      status: GroupStatus.Drawn,
+      status_flag: GroupStatus.Drawn,
     });
 
     if (!updatedGroup) {

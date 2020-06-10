@@ -2,8 +2,6 @@ import { Repository, getRepository } from 'typeorm';
 
 import IGroupUsersRepository from '@modules/groups/repositories/IGroupUsersRepository';
 
-import IUpdateSecretFriendDTO from '@modules/groups/dtos/IUpdateSecretFriendDTO';
-
 import GroupUser from '../entities/GroupUser';
 
 class GroupUserRepository implements IGroupUsersRepository {
@@ -51,20 +49,6 @@ class GroupUserRepository implements IGroupUsersRepository {
     const removeResult = await this.ormRepository.delete({ group_id, user_id });
 
     return !!removeResult.affected;
-  }
-
-  async updateSecretFriend({
-    group_id,
-    user_id,
-    secret_friend_id,
-  }: IUpdateSecretFriendDTO): Promise<GroupUser> {
-    const groupUser = await this.ormRepository.save({
-      group_id,
-      user_id,
-      secret_friend_id,
-    });
-
-    return groupUser;
   }
 }
 

@@ -3,9 +3,5 @@ declare namespace Express {
     user: {
       id: string;
     };
-
-    user_id: string;
-    user_nickname: string;
-    group_id: string;
   }
 }

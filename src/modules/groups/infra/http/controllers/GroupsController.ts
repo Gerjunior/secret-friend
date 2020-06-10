@@ -7,8 +7,6 @@ import UpdateGroupService from '@modules/groups/services/UpdateGroupService';
 import ShowGroupService from '@modules/groups/services/ShowGroupService';
 import DeleteGroupService from '@modules/groups/services/DeleteGroupService';
 
-import DrawService from '@modules/groups/services/DrawService';
-
 export default class GroupsController {
   public async findById(
     request: Request,
@@ -71,16 +69,5 @@ export default class GroupsController {
     await deleteGroup.execute({ admin_id, group_id });
 
     return response.status(204).send();
-  }
-
-  public async draw(request: Request, response: Response): Promise<Response> {
-    const user_id = request.user.id;
-    const group_id = request.params.id;
-
-    const draw = container.resolve(DrawService);
-
-    const group = await draw.execute({ user_id, group_id });
-
-    return response.json(classToClass(group));
   }
 }

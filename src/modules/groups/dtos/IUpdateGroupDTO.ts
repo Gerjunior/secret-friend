@@ -5,5 +5,5 @@ export default interface IUpdateGroupDTO {
   min_value?: number;
   reveal_date?: Date;
   draw_date?: Date;
-  status?: string;
+  status_flag?: string;
 }

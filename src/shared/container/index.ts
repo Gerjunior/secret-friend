@@ -11,6 +11,9 @@ import GroupRepository from '@modules/groups/infra/typeorm/repositories/GroupRep
 import IGroupUsersRepository from '@modules/groups/repositories/IGroupUsersRepository';
 import GroupUsersRepository from '@modules/groups/infra/typeorm/repositories/GroupUserRepository';
 
+import ISecretFriendRepository from '@modules/groups/repositories/ISecretFriendRepository';
+import SecretFriendRepository from '@modules/groups/infra/typeorm/repositories/SecretFriendRepository';
+
 container.registerSingleton<IUserRepository>('UserRepository', UserRepository);
 
 container.registerSingleton<IGroupRepository>(
@@ -21,4 +24,9 @@ container.registerSingleton<IGroupRepository>(
 container.registerSingleton<IGroupUsersRepository>(
   'GroupUsersRepository',
   GroupUsersRepository,
+);
+
+container.registerSingleton<ISecretFriendRepository>(
+  'SecretFriendRepository',
+  SecretFriendRepository,
 );
