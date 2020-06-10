@@ -24,25 +24,26 @@
         "prettier"
     ],
     "rules": {
-      "prettier/prettier": "error",
-      "class-methods-use-this": "off",
-      "@typescript-eslint/interface-name-prefix": "off",
-      "camelcase": "off",
-      "no-continue": "off",
-      "no-param-reassign": "off",
-      "no-underscore-dangle": "off",
-      "@typescript-eslint/camelcase": "off",
-      "no-useless-constructor": "off",
       "@typescript-eslint/no-unused-vars": ["warn", {
         "argsIgnorePattern": "_"
       }],
+      "class-methods-use-this": "off",
+      "camelcase": "off",
+      "import/prefer-default-export": "off",
       "import/extensions": [
         "error",
         "ignorePackages",
         {
           "ts": "never"
         }
-      ]
+      ],
+      "no-continue": "off",
+      "no-param-reassign": "off",
+      "no-underscore-dangle": "off",
+      "no-useless-constructor": "off",
+      "prettier/prettier": "error",
+      "@typescript-eslint/camelcase": "off",
+      "@typescript-eslint/interface-name-prefix": "off"
     },
     "settings": {
       "import/resolver": {

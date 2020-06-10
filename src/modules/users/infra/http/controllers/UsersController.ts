@@ -19,6 +19,8 @@ export default class UsersController {
 
     const user = await getUserById.execute(user_id);
 
+    // TODO: Return user groups
+
     return response.json(classToClass(user));
   }
 
@@ -52,22 +54,24 @@ export default class UsersController {
     const { id } = request.user;
 
     const {
-      name,
+      first_name,
       last_name,
       birth_date,
+      old_password,
       password,
+      password_confirmation,
       description,
-      first_name,
     } = request.body;
 
     const updateUser = container.resolve(UpdateUserService);
 
     const user = await updateUser.execute({
       id,
-      name,
       first_name,
       last_name,
+      old_password,
       password,
+      password_confirmation,
       birth_date,
       description,
     });

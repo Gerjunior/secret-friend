@@ -57,6 +57,8 @@ export default class GroupsController {
       reveal_date,
     });
 
+    // TODO: Return the full object
+
     return response.json(classToClass(group));
   }
 

@@ -4,6 +4,7 @@ import 'dotenv/config';
 import cors from 'cors';
 import express, { Request, Response, NextFunction } from 'express';
 import 'express-async-errors';
+import { isCelebrate } from 'celebrate';
 
 import '@shared/infra/typeorm';
 import '@shared/container';
@@ -25,6 +26,13 @@ app.use((err: Error, request: Request, response: Response, _: NextFunction) => {
     });
   }
 
+  if (isCelebrate(err)) {
+    return response.status(400).json({
+      status: 'validationError',
+      message: err.message,
+    });
+  }
+
   console.error(err);
 
   return response.status(500).json({
@@ -37,7 +45,5 @@ app.listen(3333, () => {
   console.log('(☞ﾟヮﾟ)☞ App listening on port 3333! ☜(ﾟヮﾟ☜)');
 });
 
-// TODO: celebrate
 // TODO: tests (jest)
-// TODO: JWT roles
 // TODO: helmet
