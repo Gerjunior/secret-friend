@@ -12,6 +12,7 @@ import Group from '../infra/typeorm/entities/Group';
 interface IRequest {
   group_id: string;
   user_id: string;
+  admin_id: string;
 }
 
 @injectable()
@@ -27,11 +28,28 @@ export default class AddUserToGroupService {
     private groupUsersRepository: IGroupUsersRepository,
   ) {}
 
-  public async execute({ group_id, user_id }: IRequest): Promise<Group> {
+  public async execute({
+    group_id,
+    user_id,
+    admin_id,
+  }: IRequest): Promise<Group> {
     const group = await this.groupRepository.findById(group_id);
 
     if (!group) {
       throw new AppError('Group not found.', 404);
+    }
+
+    const admin = await this.userRepository.findById(admin_id);
+
+    if (!admin) {
+      throw new AppError('Invalid admin_id token.', 400);
+    }
+
+    if (group.admin_id !== admin_id) {
+      throw new AppError(
+        'You do not have permission to add members to this group.',
+        403,
+      );
     }
 
     const user = await this.userRepository.findById(user_id);

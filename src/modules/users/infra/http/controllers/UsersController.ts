@@ -1,13 +1,11 @@
 import { Request, Response } from 'express';
-import { container, injectable } from 'tsyringe';
-import { classToClass } from 'class-transformer';
+import { container } from 'tsyringe';
 
 import CreateUserService from '@modules/users/services/CreateUserService';
 import UpdateUserService from '@modules/users/services/UpdateUserService';
 import GetUserByIdService from '@modules/users/services/GetUserByIdService';
 import DeleteUserService from '@modules/users/services/DeleteUserService';
 
-@injectable()
 export default class UsersController {
   public async getById(
     request: Request,
@@ -19,9 +17,7 @@ export default class UsersController {
 
     const user = await getUserById.execute(user_id);
 
-    // TODO: Return user groups
-
-    return response.json(classToClass(user));
+    return response.json(user);
   }
 
   public async create(request: Request, response: Response): Promise<Response> {
@@ -47,7 +43,7 @@ export default class UsersController {
       description,
     });
 
-    return response.status(201).json(classToClass(user));
+    return response.status(201).json(user);
   }
 
   public async update(request: Request, response: Response): Promise<Response> {
@@ -76,7 +72,7 @@ export default class UsersController {
       description,
     });
 
-    return response.json(classToClass(user));
+    return response.json(user);
   }
 
   public async delete(request: Request, response: Response): Promise<Response> {

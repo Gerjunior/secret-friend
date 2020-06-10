@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
-import { classToClass } from 'class-transformer';
 
 import CreateGroupService from '@modules/groups/services/CreateGroupService';
 import UpdateGroupService from '@modules/groups/services/UpdateGroupService';
@@ -37,12 +36,12 @@ export default class GroupsController {
       reveal_date,
     });
 
-    return response.status(201).json(classToClass(group));
+    return response.status(201).json(group);
   }
 
   public async update(request: Request, response: Response): Promise<Response> {
     const { id } = request.user;
-    const { group_id } = request.params;
+    const { id: group_id } = request.params;
     const { name, min_value, max_value, draw_date, reveal_date } = request.body;
 
     const updateGroup = container.resolve(UpdateGroupService);
@@ -57,9 +56,7 @@ export default class GroupsController {
       reveal_date,
     });
 
-    // TODO: Return the full object
-
-    return response.json(classToClass(group));
+    return response.json(group);
   }
 
   public async delete(request: Request, response: Response): Promise<Response> {

@@ -27,7 +27,7 @@ export default class UpdateUserService {
     private hashProvider: IHashProvider,
 
     @inject('UserRepository')
-    private UserRepository: IUserRepository,
+    private userRepository: IUserRepository,
   ) {}
 
   public async execute({
@@ -41,7 +41,7 @@ export default class UpdateUserService {
     birth_date,
     description,
   }: IRequest): Promise<User> {
-    const user = await this.UserRepository.findById(id);
+    const user = await this.userRepository.findById(id);
 
     if (!user) {
       throw new AppError('User not found.', 404);
@@ -69,7 +69,7 @@ export default class UpdateUserService {
       updated_password = await this.hashProvider.hash(password);
     }
 
-    const updatedUser = await this.UserRepository.update({
+    const updatedUser = await this.userRepository.update({
       id,
       name,
       first_name,

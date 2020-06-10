@@ -17,15 +17,15 @@ const validatePost = celebrate({
 });
 
 const validatePut = celebrate({
+  [Segments.PARAMS]: Joi.object().keys({
+    id: Joi.string().guid().message('Invalid ID').required(),
+  }),
   [Segments.BODY]: Joi.object().keys({
     name: Joi.string().max(255),
     min_value: Joi.number(),
     max_value: Joi.number(),
     draw_date: Joi.date(),
     reveal_date: Joi.date(),
-  }),
-  [Segments.PARAMS]: Joi.object().keys({
-    id: Joi.string().guid().message('Invalid ID').required(),
   }),
 });
 

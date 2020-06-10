@@ -3,7 +3,7 @@ import { classToClass } from 'class-transformer';
 
 import AppError from '@shared/errors/AppError';
 
-import GroupRepository from '../infra/typeorm/repositories/GroupRepository';
+import IGroupRepository from '../repositories/IGroupRepository';
 
 import Group from '../infra/typeorm/entities/Group';
 
@@ -11,7 +11,7 @@ import Group from '../infra/typeorm/entities/Group';
 export default class ShowGroupService {
   constructor(
     @inject('GroupRepository')
-    private groupRepository: GroupRepository,
+    private groupRepository: IGroupRepository,
   ) {}
 
   public async execute(group_id: string): Promise<Group> {

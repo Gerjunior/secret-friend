@@ -14,7 +14,9 @@ class UserRepository implements IUserRepository {
   }
 
   async findById(user_id: string): Promise<User | undefined> {
-    return this.ormRepository.findOne(user_id);
+    return this.ormRepository.findOne(user_id, {
+      relations: ['groups', 'groups.group'],
+    });
   }
 
   async findByEmail(user_email: string): Promise<User | undefined> {

@@ -1,4 +1,5 @@
 import { inject, injectable } from 'tsyringe';
+import { classToClass } from 'class-transformer';
 
 import IGroupRepository from '@modules/groups/repositories/IGroupRepository';
 
@@ -46,7 +47,7 @@ export default class UpdateGroupService {
     }
 
     const updatedGroup = await this.groupRepository.update({
-      group_id,
+      id: group_id,
       draw_date,
       max_value,
       min_value,
@@ -58,6 +59,6 @@ export default class UpdateGroupService {
       throw new AppError('Group not found', 404);
     }
 
-    return updatedGroup;
+    return classToClass(updatedGroup);
   }
 }

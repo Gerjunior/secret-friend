@@ -1,5 +1,5 @@
 export default interface IUpdateGroupDTO {
-  group_id: string;
+  id: string;
   name?: string;
   max_value?: number;
   min_value?: number;

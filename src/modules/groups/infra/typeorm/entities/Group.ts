@@ -45,7 +45,7 @@ class Group {
   @Column({ name: 'status', default: 'A' })
   status_flag: string;
 
-  @OneToMany(() => GroupUser, groupUser => groupUser.groups)
+  @OneToMany(() => GroupUser, groupUser => groupUser.group)
   members: GroupUser[];
 
   @CreateDateColumn()

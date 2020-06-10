@@ -19,7 +19,7 @@ class GroupUser {
 
   @ManyToOne(() => Group, { primary: true })
   @JoinColumn({ name: 'group_id' })
-  groups: Group[];
+  group: Group;
 
   @PrimaryColumn()
   user_id: string;

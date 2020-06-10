@@ -38,7 +38,7 @@ class User {
   @Column()
   description: string;
 
-  @OneToMany(() => GroupUser, groupUser => groupUser.groups)
+  @OneToMany(() => GroupUser, groupUser => groupUser.user)
   groups: GroupUser[];
 
   @CreateDateColumn()

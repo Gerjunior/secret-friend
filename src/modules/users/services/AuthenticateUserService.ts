@@ -1,6 +1,7 @@
 import { compare } from 'bcrypt';
 import { sign } from 'jsonwebtoken';
 import { injectable, inject } from 'tsyringe';
+import { classToClass } from 'class-transformer';
 
 import IUserRepository from '@modules/users/repositories/IUserRepository';
 import AppError from '@shared/errors/AppError';
@@ -43,9 +44,9 @@ export default class AuthenticateUserService {
       expiresIn: process.env.jwtExpiresIn,
     });
 
-    return {
+    return classToClass({
       token,
       user,
-    };
+    });
   }
 }

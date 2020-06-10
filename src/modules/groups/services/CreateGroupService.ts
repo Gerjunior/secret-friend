@@ -1,5 +1,6 @@
 import { isBefore, parseISO } from 'date-fns';
 import { injectable, inject } from 'tsyringe';
+import { classToClass } from 'class-transformer';
 
 import Group from '@modules/groups/infra/typeorm/entities/Group';
 
@@ -88,6 +89,6 @@ export default class CreateGroupService {
 
     await this.groupUsersRepository.addMember(group.id, admin.id);
 
-    return group;
+    return classToClass(group);
   }
 }

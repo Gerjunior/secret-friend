@@ -19,14 +19,11 @@ const validatePost = celebrate({
 });
 
 const validatePut = celebrate({
-  [Segments.PARAMS]: Joi.object().keys({
-    id: Joi.string().guid().message('Invalid ID').required(),
-  }),
   [Segments.BODY]: Joi.object().keys({
     first_name: Joi.string().max(255),
     last_name: Joi.string().max(255),
     email: Joi.string().email().max(255),
-    old_password: Joi.string().required().max(255),
+    old_password: Joi.string().max(255),
     password: Joi.string().max(255),
     password_confirmation: Joi.string().valid(Joi.ref('password')).max(255),
     birth_date: Joi.date(),

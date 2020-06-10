@@ -28,13 +28,12 @@ class GroupRepository implements IGroupRepository {
     return group;
   }
 
-  async update({
-    group_id,
-    ...data
-  }: IUpdateGroupDTO): Promise<Group | undefined> {
-    const group = (await this.ormRepository.findOne(group_id)) as Group;
+  async update(data: IUpdateGroupDTO): Promise<Group | undefined> {
+    await this.ormRepository.save(data);
 
-    return this.ormRepository.save({ ...group, ...data });
+    const group_id = data.id;
+
+    return this.findById(group_id);
   }
 
   async delete(group_id: string): Promise<boolean> {
