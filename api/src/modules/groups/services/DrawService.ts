@@ -107,7 +107,7 @@ export default class DrawService {
     });
 
     const updatedGroup = await this.groupRepository.update({
-      group_id,
+      id: group_id,
       draw_date: new Date(),
       status_flag: GroupStatus.Drawn,
     });

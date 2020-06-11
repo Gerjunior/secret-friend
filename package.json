@@ -1,0 +1,14 @@
+{
+  "name": "secret-friend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/Gerjunior/secret-friend",
+  "author": "Geraldo Júnior <geraldojuni@hotmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "cd api && yarn start",
+    "build": "cd api && yarn && yarn build",
+    "dev:install": "cd api && yarn",
+    "dev:server": "cd api && yarn dev:server"
+  }
+}
