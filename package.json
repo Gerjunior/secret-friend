@@ -7,8 +7,6 @@
   "license": "MIT",
   "scripts": {
     "start": "cd api && yarn start",
-    "build": "cd api && yarn && yarn build",
-    "dev:install": "cd api && yarn",
-    "dev:server": "cd api && yarn dev:server"
+    "build": "cd api && yarn && yarn build && npx typeorm migration:run"
   }
 }
