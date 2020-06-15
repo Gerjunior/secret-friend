@@ -24,6 +24,7 @@ class UserRepository implements IUserRepository {
       where: {
         email: user_email,
       },
+      relations: ['groups', 'groups.group'],
     });
 
     return user;
