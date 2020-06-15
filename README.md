@@ -70,23 +70,30 @@ You will probably need to install Docker. You can do this by clicking [here](htt
 ```sh
 git clone https://github.com/gerjunior/secret-friend
 ```
-2. Install packages
+2. Go inside the api folder
+```sh
+cd api
+```
+3. Install packages
 ```sh
 yarn install
 ```
-3. Create a postgres instance in docker
+4. Create a postgres instance in docker
 ```sh
 docker run --name postgres -e POSTGRES_PASSWORD=docker -p 5432:5432 postgres
 ```
-4. Create a new database for the project and configure the connection.
-
+5. Create a new database for the project and configure the connection. Name it "secret-friend"
    PS: You can use [DBeaver](https://dbeaver.io/) to create the database.
 
-   PS2: [Here](https://gist.github.com/Gerjunior/0e679b0e9c2f59fee4ec4b293d96f187) is an example of how to create the connection with the ormconfig.json file.
+5. Create a new file inside the api folder named *.env*. Copy and paste the content of *.env.example* inside it.
 
-5. Start the api
+6. Start the api
 ```sh
 yarn dev:server
+```
+or
+```
+yarn start
 ```
 
 <!-- ROADMAP -->
