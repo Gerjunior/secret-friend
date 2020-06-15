@@ -56,6 +56,7 @@ After starting [GoStack](https://rocketseat.com.br/), I decided that I had to pr
 * [NodeJS](https://nodejs.org/en/)
 * [Typescript](https://www.typescriptlang.org/)
 * [Postgres](https://www.postgresql.org/)
+* [Redis](https://redis.io/)
 
 <!-- GETTING STARTED -->
 ## Getting Started
@@ -78,9 +79,10 @@ cd api
 ```sh
 yarn install
 ```
-4. Create a postgres instance in docker
+4. Create a postgres and redis instance in docker
 ```sh
 docker run --name postgres -e POSTGRES_PASSWORD=docker -p 5432:5432 postgres
+docker run --name redis -p 6379:6379 -d -t redis:alpine
 ```
 5. Create a new database for the project and configure the connection. Name it "secret-friend"
    PS: You can use [DBeaver](https://dbeaver.io/) to create the database.

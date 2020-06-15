@@ -6,6 +6,7 @@ declare namespace NodeJS {
     NODE_ENV: string;
 
     DATABASE_URL: string;
+    REDIS_URL: string;
 
     BASE_DIR: string;
     FILE_EXTENSION: string;
