@@ -50,6 +50,12 @@ class GroupUserRepository implements IGroupUsersRepository {
 
     return !!removeResult.affected;
   }
+
+  async removeAllMembers(group_id: string): Promise<boolean> {
+    const removeResult = await this.ormRepository.delete({ group_id });
+
+    return !!removeResult.affected;
+  }
 }
 
 export default GroupUserRepository;

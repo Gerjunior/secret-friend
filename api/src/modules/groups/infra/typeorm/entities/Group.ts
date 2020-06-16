@@ -31,22 +31,22 @@ class Group {
   admin: User;
 
   @Column()
-  min_value: number;
+  min_value?: number;
 
   @Column()
-  max_value: number;
+  max_value?: number;
 
   @Column()
-  draw_date: Date;
+  draw_date?: Date;
 
   @Column()
-  reveal_date: Date;
+  reveal_date?: Date;
 
   @Column({ name: 'status', default: 'A' })
   status_flag: string;
 
   @OneToMany(() => GroupUser, groupUser => groupUser.group)
-  members: GroupUser[];
+  members?: GroupUser[];
 
   @CreateDateColumn()
   created_at: Date;

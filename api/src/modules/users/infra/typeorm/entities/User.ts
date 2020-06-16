@@ -17,29 +17,29 @@ class User {
   id: string;
 
   @Column()
-  first_name: string;
+  first_name?: string;
 
   @Column()
-  last_name: string;
+  last_name?: string;
 
   @Column()
   email: string;
 
   @Column()
-  birth_date: Date;
+  birth_date?: Date;
 
   @Column()
-  nickname: string;
+  nickname?: string;
 
   @Column()
   @Exclude()
   password: string;
 
   @Column()
-  description: string;
+  description?: string;
 
   @OneToMany(() => GroupUser, groupUser => groupUser.user)
-  groups: GroupUser[];
+  groups?: GroupUser[];
 
   @CreateDateColumn()
   @Exclude()

@@ -6,12 +6,12 @@ import DrawService from '@modules/groups/services/DrawService';
 
 export default class GroupsController {
   public async draw(request: Request, response: Response): Promise<Response> {
-    const user_id = request.user.id;
+    const admin_id = request.user.id;
     const group_id = request.params.id;
 
     const draw = container.resolve(DrawService);
 
-    const group = await draw.execute({ user_id, group_id });
+    const group = await draw.execute({ admin_id, group_id });
 
     return response.json(classToClass(group));
   }

@@ -49,28 +49,21 @@ export default class RemoveUserFromGroupService {
       );
     }
 
-    const user = group.members.find(member => member.user_id === user_id);
+    const groupUser = await this.groupUsersRepository.findByUserAndGroupIds(
+      group_id,
+      user_id,
+    );
 
-    if (!user) {
+    if (!groupUser) {
       throw new AppError('User not member of this group.', 400);
     }
 
-    const removedMember = await this.groupUsersRepository.removeMember(
-      group_id,
-      user.user_id,
-    );
-
-    if (!removedMember) {
-      throw new AppError(
-        'An unexpected error happened while trying to remove a user from the group. Please try again later.',
-        400,
-      );
-    }
+    await this.groupUsersRepository.removeMember(group_id, user_id);
 
     if (admin_id === user_id) {
       await this.groupRepository.delete(group_id);
     }
 
-    return removedMember;
+    return true;
   }
 }

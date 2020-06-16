@@ -7,6 +7,7 @@ import IUserRepository from '@modules/users/repositories/IUserRepository';
 import GroupStatus from '@modules/groups/entities/enums/GroupStatus';
 
 import AppError from '@shared/errors/AppError';
+
 import Group from '../infra/typeorm/entities/Group';
 
 interface IRequest {
@@ -74,18 +75,12 @@ export default class AddUserToGroupService {
       );
     }
 
-    const updatedGroupUser = await this.groupUsersRepository.addMember(
+    await this.groupUsersRepository.addMember(group_id, user_id);
+
+    const updatedGroup = (await this.groupRepository.findById(
       group_id,
-      user_id,
-    );
+    )) as Group;
 
-    if (!updatedGroupUser) {
-      throw new AppError(
-        'An unexpected error happened while trying to add a user to the group. Please try again later.',
-        400,
-      );
-    }
-
-    return group;
+    return updatedGroup;
   }
 }

@@ -10,9 +10,9 @@ import User from '../infra/typeorm/entities/User';
 
 interface IRequest {
   id: string;
-  name?: string;
   first_name?: string;
   last_name?: string;
+  nickname?: string;
   old_password?: string;
   password?: string;
   password_confirmation?: string;
@@ -23,18 +23,18 @@ interface IRequest {
 @injectable()
 export default class UpdateUserService {
   constructor(
-    @inject('HashProvider')
-    private hashProvider: IHashProvider,
-
     @inject('UserRepository')
     private userRepository: IUserRepository,
+
+    @inject('HashProvider')
+    private hashProvider: IHashProvider,
   ) {}
 
   public async execute({
     id,
-    name,
     first_name,
     last_name,
+    nickname,
     old_password,
     password,
     password_confirmation,
@@ -50,7 +50,7 @@ export default class UpdateUserService {
     let updated_password = user.password;
 
     if (old_password && password && password_confirmation) {
-      const password_match = this.hashProvider.compare(
+      const password_match = await this.hashProvider.compare(
         old_password,
         user.password,
       );
@@ -71,21 +71,14 @@ export default class UpdateUserService {
 
     const updatedUser = await this.userRepository.update({
       id,
-      name,
       first_name,
       last_name,
       password: updated_password,
       birth_date,
       description,
+      nickname,
     });
 
-    if (!updatedUser) {
-      throw new AppError(
-        'There was an error trying to update your profile. Please try again later.',
-        400,
-      );
-    }
-
-    return classToClass(updatedUser);
+    return classToClass(updatedUser as User);
   }
 }

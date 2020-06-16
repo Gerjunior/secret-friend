@@ -16,7 +16,9 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "forceConsistentCasingInFileNames": true,
-    "types": [],
+    "types": [
+      "jest"
+    ],
     "plugins": [
       {
         "transform": "typescript-transform-paths",

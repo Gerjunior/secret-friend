@@ -12,9 +12,15 @@ import IGroupUsersRepository from '../repositories/IGroupUsersRepository';
 import GroupUser from '../infra/typeorm/entities/GroupUser';
 
 interface IRequest {
-  user_id: string;
+  admin_id: string;
   group_id: string;
 }
+
+interface DrawResult {
+  id: string;
+  secret_friend: string;
+}
+
 @injectable()
 export default class DrawService {
   constructor(
@@ -28,14 +34,14 @@ export default class DrawService {
     private secretFriendRepository: ISecretFriendRepository,
   ) {}
 
-  public async execute({ group_id, user_id }: IRequest): Promise<Group> {
+  public async execute({ group_id, admin_id }: IRequest): Promise<Group> {
     const group = await this.groupRepository.findById(group_id);
 
     if (!group) {
       throw new AppError('Group not found.', 404);
     }
 
-    if (group.admin_id !== user_id) {
+    if (group.admin_id !== admin_id) {
       throw new AppError('You are not allowed to realize the draw.');
     }
 
@@ -46,58 +52,56 @@ export default class DrawService {
       );
     }
 
-    if (group.members.length < 3) {
+    const groupUsers = await this.groupUsersRepository.findByGroupId(group_id);
+
+    if (!groupUsers || groupUsers.length < 3) {
       throw new AppError('You need at least 3 members to start the draw!');
     }
 
-    const drawObject = group.members.map(member => {
+    const drawObject = groupUsers.map(member => {
       return {
-        id: member.user.id,
+        id: member.user_id,
         secret_friend: '',
         already_chosen: false,
       };
     });
 
-    for (let i = 0; i < drawObject.length; i += 1) {
-      while (!drawObject[i].secret_friend) {
+    drawObject.forEach(member => {
+      while (!member.secret_friend) {
         const secret_friend =
-          drawObject[Math.floor(Math.random() * drawObject.length)]; // GET A RANDOM INDEX FROM DRAWOBJECT
+          drawObject[Math.floor(Math.random() * drawObject.length)];
 
         if (
-          drawObject[i].id === secret_friend.id || // VERIFY IF THE SELECTED SECRET FRIEND ID IS NOT THE SAME AS THE FIRST USER
-          secret_friend.already_chosen // VERIFY IF THE SELECTED SECRET FRIEND IS NOT ALREALDY CHOSEN
+          member.id === secret_friend.id ||
+          secret_friend.already_chosen ||
+          member.id === secret_friend.secret_friend
         ) {
           continue;
         }
 
-        drawObject[i].secret_friend = secret_friend.id;
+        member.secret_friend = secret_friend.id;
 
-        const secret_friend_index = group.members.findIndex(
-          member => member.user.id === secret_friend.id,
+        const secret_friend_index = groupUsers.findIndex(
+          findUser => findUser.user_id === secret_friend.id,
         );
+
         drawObject[secret_friend_index].already_chosen = true;
       }
-    }
+    });
 
     const draw_result = drawObject.map(user => {
       return { id: user.id, secret_friend: user.secret_friend };
     });
 
-    group.members.forEach(async member => {
+    groupUsers.forEach(async member => {
       const draw_result_item = draw_result.find(
-        item => item.id === member.user.id,
-      );
+        item => item.id === member.user_id,
+      ) as DrawResult;
 
-      if (!draw_result_item) {
-        throw new AppError(
-          'This error should never occur. Just here because of TypeScript rules.',
-          400,
-        );
-      }
-
-      const secret_friend = group.members.find(
-        user => user.user_id === draw_result_item.secret_friend,
-      ) as GroupUser;
+      const secret_friend = (await this.groupUsersRepository.findByUserAndGroupIds(
+        group_id,
+        draw_result_item.secret_friend,
+      )) as GroupUser;
 
       await this.secretFriendRepository.updateSecretFriend({
         group_id,
@@ -112,13 +116,6 @@ export default class DrawService {
       status_flag: GroupStatus.Drawn,
     });
 
-    if (!updatedGroup) {
-      throw new AppError(
-        'An unexpected error happened. Please try again.',
-        400,
-      );
-    }
-
-    return updatedGroup;
+    return updatedGroup as Group;
   }
 }

@@ -52,6 +52,7 @@ export default class UsersController {
     const {
       first_name,
       last_name,
+      nickname,
       birth_date,
       old_password,
       password,
@@ -65,6 +66,7 @@ export default class UsersController {
       id,
       first_name,
       last_name,
+      nickname,
       old_password,
       password,
       password_confirmation,

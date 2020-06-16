@@ -1,7 +1,5 @@
 import { injectable, inject } from 'tsyringe';
 
-import Group from '@modules/groups/infra/typeorm/entities/Group';
-
 import AppError from '@shared/errors/AppError';
 
 import IUserRepository from '@modules/users/repositories/IUserRepository';
@@ -15,7 +13,7 @@ interface IRequest {
 }
 
 @injectable()
-export default class CreateGroupService {
+export default class DeleteGroupService {
   constructor(
     @inject('UserRepository')
     private userRepository: IUserRepository,
@@ -27,7 +25,7 @@ export default class CreateGroupService {
     private groupUsersRepository: IGroupUsersRepository,
   ) {}
 
-  public async execute({ admin_id, group_id }: IRequest): Promise<Group> {
+  public async execute({ admin_id, group_id }: IRequest): Promise<boolean> {
     const admin = await this.userRepository.findById(admin_id);
 
     if (!admin) {
@@ -46,13 +44,8 @@ export default class CreateGroupService {
 
     const isDeleted = await this.groupRepository.delete(group_id);
 
-    if (!isDeleted) {
-      throw new AppError(
-        'There was an error deleting the group. Please try again.',
-        400,
-      );
-    }
+    await this.groupUsersRepository.removeAllMembers(group_id);
 
-    return group;
+    return isDeleted;
   }
 }

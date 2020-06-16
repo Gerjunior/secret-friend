@@ -11,13 +11,13 @@ export default class DeleteUserService {
     private userRepository: IUserRepository,
   ) {}
 
-  public async execute(id: string): Promise<void> {
+  public async execute(id: string): Promise<boolean> {
     const user = await this.userRepository.findById(id);
 
     if (!user) {
       throw new AppError('User not found.', 404);
     }
 
-    await this.userRepository.delete(id);
+    return this.userRepository.delete(id);
   }
 }

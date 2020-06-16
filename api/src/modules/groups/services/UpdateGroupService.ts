@@ -55,10 +55,6 @@ export default class UpdateGroupService {
       reveal_date,
     });
 
-    if (!updatedGroup) {
-      throw new AppError('Group not found', 404);
-    }
-
-    return classToClass(updatedGroup);
+    return classToClass(updatedGroup as Group);
   }
 }

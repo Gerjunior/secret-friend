@@ -3,6 +3,7 @@ import { Repository, getRepository } from 'typeorm';
 import IUserRepository from '@modules/users/repositories/IUserRepository';
 
 import ICreateUserDTO from '@modules/users/dtos/ICreateUserDTO';
+import IUpdateUserDTO from '@modules/users/dtos/IUpdateUserDTO';
 
 import User from '../entities/User';
 
@@ -54,12 +55,26 @@ class UserRepository implements IUserRepository {
     return user;
   }
 
-  async update(data: User): Promise<User | undefined> {
-    await this.ormRepository.save(data);
+  async update({
+    id,
+    birth_date,
+    description,
+    first_name,
+    last_name,
+    nickname,
+    password,
+  }: IUpdateUserDTO): Promise<User | undefined> {
+    await this.ormRepository.save({
+      id,
+      birth_date,
+      description,
+      first_name,
+      last_name,
+      nickname,
+      password,
+    });
 
-    const user_id = data.id;
-
-    return this.findById(user_id);
+    return this.findById(id);
   }
 
   async delete(user_id: string): Promise<boolean> {

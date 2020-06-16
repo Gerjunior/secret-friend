@@ -14,7 +14,7 @@ class GroupRepository implements IGroupRepository {
     this.ormRepository = getRepository(Group);
   }
 
-  findById(group_id: string): Promise<Group | undefined> {
+  async findById(group_id: string): Promise<Group | undefined> {
     return this.ormRepository.findOne(group_id, {
       relations: ['admin', 'members', 'members.user'],
     });

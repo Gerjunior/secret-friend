@@ -9,4 +9,5 @@ export default interface IGroupUsersRepository {
   ): Promise<GroupUser | undefined>;
   addMember(group_id: string, user_id: string): Promise<GroupUser | undefined>;
   removeMember(group_id: string, user_id: string): Promise<boolean>;
+  removeAllMembers(group_id: string): Promise<boolean>;
 }
