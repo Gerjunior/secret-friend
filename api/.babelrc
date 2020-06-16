@@ -11,7 +11,8 @@
         "root": ["./dist"],
         "alias": {
           "@modules": "./dist/modules",
-          "@shared": "./dist/shared"
+          "@shared": "./dist/shared",
+          "@config": "./dist/config"
         }
       }
     ]
