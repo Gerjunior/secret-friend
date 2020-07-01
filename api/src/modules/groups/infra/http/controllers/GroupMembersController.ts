@@ -5,7 +5,7 @@ import { classToClass } from 'class-transformer';
 import AddUserToGroupService from '@modules/groups/services/AddUserToGroupService';
 import RemoveUserFromGroupService from '@modules/groups/services/RemoveUserFromGroupService';
 
-export default class GroupUsersController {
+export default class GroupMembersController {
   public async add(request: Request, response: Response): Promise<Response> {
     const { id: admin_id } = request.user;
     const { group_id, user_id } = request.body;

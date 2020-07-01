@@ -13,7 +13,7 @@ const usersRouter = Router();
 
 const usersController = new UsersController();
 
-usersRouter.get('/:user_id', validateGet, usersController.getById);
+usersRouter.get('/:id', validateGet, usersController.getById);
 usersRouter.post('/', validatePost, usersController.create);
 usersRouter.put('/', validatePut, ensureAuthenticated, usersController.update);
 usersRouter.delete('/', ensureAuthenticated, usersController.delete);

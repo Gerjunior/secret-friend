@@ -11,11 +11,11 @@ export default class UsersController {
     request: Request,
     response: Response,
   ): Promise<Response> {
-    const { user_id } = request.params;
+    const { id } = request.params;
 
     const getUserById = container.resolve(GetUserByIdService);
 
-    const user = await getUserById.execute(user_id);
+    const user = await getUserById.execute(id);
 
     return response.json(user);
   }

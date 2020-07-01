@@ -2,7 +2,7 @@ import { celebrate, Joi, Segments } from 'celebrate';
 
 const validateGet = celebrate({
   [Segments.PARAMS]: Joi.object().keys({
-    id: Joi.string().guid().message('Invalid ID.').required(),
+    id: Joi.string().guid().message('Invalid group ID.').required(),
   }),
 });
 
@@ -18,7 +18,7 @@ const validatePost = celebrate({
 
 const validatePut = celebrate({
   [Segments.PARAMS]: Joi.object().keys({
-    id: Joi.string().guid().message('Invalid ID').required(),
+    id: Joi.string().guid().message('Invalid group ID').required(),
   }),
   [Segments.BODY]: Joi.object().keys({
     name: Joi.string().max(255),
@@ -31,13 +31,13 @@ const validatePut = celebrate({
 
 const validateDelete = celebrate({
   [Segments.PARAMS]: Joi.object().keys({
-    id: Joi.string().guid().message('Invalid ID.').required(),
+    id: Joi.string().guid().message('Invalid group ID.').required(),
   }),
 });
 
 const validateDraw = celebrate({
   [Segments.PARAMS]: Joi.object().keys({
-    id: Joi.string().guid().message('Invalid ID.').required(),
+    id: Joi.string().guid().message('Invalid group ID.').required(),
   }),
 });
 
