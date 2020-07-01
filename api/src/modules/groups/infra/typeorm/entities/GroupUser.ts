@@ -14,21 +14,21 @@ import { Exclude } from 'class-transformer';
 @Entity('group_user')
 class GroupUser {
   @Exclude()
-  @PrimaryColumn()
+  @PrimaryColumn('uuid')
   group_id: string;
 
   @ManyToOne(() => Group, { primary: true })
   @JoinColumn({ name: 'group_id' })
   group: Group;
 
-  @PrimaryColumn()
+  @PrimaryColumn('uuid')
   user_id: string;
 
   @ManyToOne(() => User, { primary: true })
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @Column()
+  @Column('uuid')
   secret_friend_id: string;
 
   @CreateDateColumn()

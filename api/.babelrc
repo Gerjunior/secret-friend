@@ -1,20 +1,22 @@
 {
-  "compact": false,
-  "retainLines": true,
-  "minified": false,
-  "inputSourceMap": false,
-  "sourceMaps": false,
+  "presets": [
+    "@babel/preset-env",
+    "@babel/preset-typescript"
+  ],
   "plugins": [
-    [
-      "module-resolver",
-      {
-        "root": ["./dist"],
-        "alias": {
-          "@modules": "./dist/modules",
-          "@shared": "./dist/shared",
-          "@config": "./dist/config"
-        }
-      }
-    ]
+    "@babel/plugin-transform-runtime",
+    ["@babel/plugin-proposal-decorators", { "legacy": true }],
+    ["@babel/plugin-proposal-class-properties", { "loose": true }],
+    ["module-resolver", {
+			"root": ["./dist"],
+			"alias": {
+				"@config": "./dist/config",
+				"@modules": "./dist/modules",
+				"@shared": "./dist/shared"
+			}
+    }]
+  ],
+  "ignore": [
+    "**/*.spec.ts"
   ]
 }

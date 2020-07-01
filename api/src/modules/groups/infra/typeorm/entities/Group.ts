@@ -20,29 +20,29 @@ class Group {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column('varchar')
   name: string;
 
-  @Column()
+  @Column('uuid')
   admin_id: string;
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'admin_id' })
   admin: User;
 
-  @Column()
+  @Column('decimal')
   min_value?: number;
 
-  @Column()
+  @Column('decimal')
   max_value?: number;
 
-  @Column()
+  @Column('date')
   draw_date?: Date;
 
-  @Column()
+  @Column('date')
   reveal_date?: Date;
 
-  @Column({ name: 'status', default: 'A' })
+  @Column({ name: 'status', default: 'A', type: 'varchar' })
   status_flag: string;
 
   @OneToMany(() => GroupUser, groupUser => groupUser.group)

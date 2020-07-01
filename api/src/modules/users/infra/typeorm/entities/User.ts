@@ -16,26 +16,26 @@ class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column('varchar')
   first_name?: string;
 
-  @Column()
+  @Column('varchar')
   last_name?: string;
 
-  @Column()
+  @Column('varchar')
   email: string;
 
-  @Column()
+  @Column('date')
   birth_date?: Date;
 
-  @Column()
+  @Column('varchar')
   nickname?: string;
 
-  @Column()
+  @Column('varchar')
   @Exclude()
   password: string;
 
-  @Column()
+  @Column('varchar')
   description?: string;
 
   @OneToMany(() => GroupUser, groupUser => groupUser.user)
