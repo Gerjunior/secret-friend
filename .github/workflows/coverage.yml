@@ -8,6 +8,7 @@ on:
 jobs:
   coverage_report:
     name: "Codecov Report"
+    runs-on: "ubuntu-latest"
     steps:
     - uses: actions/checkout@master
     - uses: codecov/codecov-action@v1
