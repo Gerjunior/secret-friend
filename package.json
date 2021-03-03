@@ -14,7 +14,7 @@
   "dependencies": {
     "bcrypt": "^4.0.1",
     "celebrate": "^12.1.1",
-    "class-transformer": "^0.2.3",
+    "class-transformer": "^0.3.1",
     "clean-deep": "^3.3.0",
     "cors": "^2.8.5",
     "date-fns": "^2.12.0",
