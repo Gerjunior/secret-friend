@@ -1,0 +1,10 @@
+on: [pull_request]
+
+jobs:
+  coverage_report:
+    name: "Codecov Report"
+    steps:
+    - uses: actions/checkout@master
+    - uses: codecov/codecov-action@v1
+    run: yarn test:coverage
+
