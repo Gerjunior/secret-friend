@@ -1,0 +1,21 @@
+name: 'Coverage Report'
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  coverage_report:
+    name: "Codecov Report"
+    runs-on: "ubuntu-latest"
+    steps:
+    - uses: actions/checkout@master
+    - uses: codecov/codecov-action@v1
+      with:
+        comment: true
+    - run: |
+        yarn install
+        yarn test:coverage
+    - run: bash <(curl -s https://codecov.io/bash)
+
