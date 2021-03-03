@@ -12,6 +12,8 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - uses: codecov/codecov-action@v1
+      with:
+        comment: true
     - run: |
         yarn install
         yarn test:coverage
