@@ -14,8 +14,7 @@ jobs:
     - uses: codecov/codecov-action@v1
       with:
         comment: true
-    - run: |
-        yarn install
-        yarn test:coverage
+    - run: yarn install
+    - run: yarn test:coverage
     - run: bash <(curl -s https://codecov.io/bash)
 
