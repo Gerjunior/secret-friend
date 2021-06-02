@@ -1,5 +1,7 @@
 <!--
-*** Template em https://github.com/othneildrew/Best-README-Template 
+*** Template em https://github.com/othneildrew/Best-README-Template
+-->
+<!-- test
 -->
 
 [![Contributors][contributors-shield]][contributors-url]
@@ -25,26 +27,22 @@
     <a href="https://github.com/gerjunior/secret-friend/issues">Request a Feature</a>
   </p>
 
-
-
 </p>
-
-
 
 <!-- TABLE OF CONTENTS -->
 
 ## Index
 
-* [About the project](#about-the-project)
-  * [Tools](#tools)
-* [Getting Started](#getting-started)
-  * [Prerequisites](#prerequisites)
-  * [Installation](#installation)
-* [Roadmap](#roadmap)
-* [Contributing](#contributing)
-* [License](#license)
-* [Contact](#contact)
-* [Acknowledgements](#acknowledgements)
+- [Index](#index)
+- [About the project](#about-the-project)
+  - [Tools](#tools)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
+- [Contact](#contact)
+- [Acknowledgements](#acknowledgements)
 
 <!-- ABOUT THE PROJECT -->
 ## About the project
@@ -68,32 +66,43 @@ You will probably need to install Docker. You can do this by clicking [here](htt
 ### Installation
 
 1. Clone the repo
+
 ```sh
 git clone https://github.com/gerjunior/secret-friend
 ```
+
 2. Go inside the api folder
+
 ```sh
 cd api
 ```
+
 3. Install packages
+
 ```sh
 yarn install
 ```
+
 4. Create a postgres and redis instance in docker
+
 ```sh
 docker run --name postgres -e POSTGRES_PASSWORD=docker -p 5432:5432 postgres
 docker run --name redis -p 6379:6379 -d -t redis:alpine
 ```
+
 5. Create a new database for the project and configure the connection. Name it "secret-friend"
    PS: You can use [DBeaver](https://dbeaver.io/) to create the database.
 
 5. Create a new file inside the api folder named *.env*. Copy and paste the content of *.env.example* inside it.
 
 6. Start the api
+
 ```sh
 yarn dev:server
 ```
+
 or
+
 ```
 yarn start
 ```
@@ -125,9 +134,10 @@ Contributions are what make the open source community such an amazing place to b
 <!-- ACKNOWLEDGEMENTS -->
 
 ## Acknowledgements
+
 * [Docker](https://www.docker.com/)
 * [Express](https://expressjs.com/pt-br/)
-* [Linting](https://stackoverflow.com/questions/8503559/what-is-linting) | [EsLint](https://eslint.org/) 
+* [Linting](https://stackoverflow.com/questions/8503559/what-is-linting) | [EsLint](https://eslint.org/)
 * [ORM](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwibhdrHzOjpAhXLHLkGHYZ5BbUQwqsBMA16BAgKEAQ&url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DsnOXxJa31GI&usg=AOvVaw0lVRdltJqZhaPZEnZ2dSET)
 * [Typeorm](https://typeorm.io/#/)
 * [Yarn](https://yarnpkg.com/)
